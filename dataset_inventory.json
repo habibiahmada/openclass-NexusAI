@@ -1,0 +1,184 @@
+{
+  "version": "1.0",
+  "created_date": "2024-01-10",
+  "last_updated": "2024-01-10",
+  "total_files": 15,
+  "storage_location": "s3://openclass-nexus-data/raw-pdf/kelas_10/informatika/",
+  "subjects": {
+    "informatika": {
+      "grade_level": "kelas_10",
+      "file_count": 15,
+      "total_size_mb": "estimated_150-200",
+      "source": "BSE Kemdikbud and official educational materials",
+      "s3_prefix": "raw-pdf/kelas_10/informatika/"
+    }
+  },
+  "files": [
+    {
+      "filename": "20221-informatika.pdf",
+      "subject": "informatika",
+      "grade": "kelas_10",
+      "type": "textbook",
+      "source": "BSE Kemdikbud",
+      "license": "Open Educational Resource",
+      "s3_key": "raw-pdf/kelas_10/informatika/20221-informatika.pdf"
+    },
+    {
+      "filename": "70764605INFORMATIKASMK.pdf",
+      "subject": "informatika",
+      "grade": "kelas_10",
+      "type": "textbook_smk",
+      "source": "BSE Kemdikbud",
+      "license": "Open Educational Resource",
+      "s3_key": "raw-pdf/kelas_10/informatika/70764605INFORMATIKASMK.pdf"
+    },
+    {
+      "filename": "Buku Murid Informatika - Informatika Semester 1 Bab 4 - Fase E.pdf",
+      "subject": "informatika",
+      "grade": "kelas_10",
+      "type": "student_book",
+      "source": "BSE Kemdikbud",
+      "license": "Open Educational Resource",
+      "s3_key": "raw-pdf/kelas_10/informatika/Buku Murid Informatika - Informatika Semester 1 Bab 4 - Fase E.pdf"
+    },
+    {
+      "filename": "Buku-Panduan-Informatika-untuk-SMA-Kelas-X.pdf",
+      "subject": "informatika",
+      "grade": "kelas_10",
+      "type": "teacher_guide_sma",
+      "source": "BSE Kemdikbud",
+      "license": "Open Educational Resource",
+      "s3_key": "raw-pdf/kelas_10/informatika/Buku-Panduan-Informatika-untuk-SMA-Kelas-X.pdf"
+    },
+    {
+      "filename": "Buku-Panduan-Informatika-untuk-SMK-MAK-Kelas-X.pdf",
+      "subject": "informatika",
+      "grade": "kelas_10",
+      "type": "teacher_guide_smk",
+      "source": "BSE Kemdikbud",
+      "license": "Open Educational Resource",
+      "s3_key": "raw-pdf/kelas_10/informatika/Buku-Panduan-Informatika-untuk-SMK-MAK-Kelas-X.pdf"
+    },
+    {
+      "filename": "informatika-31320.pdf",
+      "subject": "informatika",
+      "grade": "kelas_10",
+      "type": "textbook",
+      "source": "BSE Kemdikbud",
+      "license": "Open Educational Resource",
+      "s3_key": "raw-pdf/kelas_10/informatika/informatika-31320.pdf"
+    },
+    {
+      "filename": "Informatika-BG-KLS-X.pdf",
+      "subject": "informatika",
+      "grade": "kelas_10",
+      "type": "teacher_guide",
+      "source": "BSE Kemdikbud",
+      "license": "Open Educational Resource",
+      "s3_key": "raw-pdf/kelas_10/informatika/Informatika-BG-KLS-X.pdf"
+    },
+    {
+      "filename": "Informatika-BS-KLS-X.pdf",
+      "subject": "informatika",
+      "grade": "kelas_10",
+      "type": "student_book",
+      "source": "BSE Kemdikbud",
+      "license": "Open Educational Resource",
+      "s3_key": "raw-pdf/kelas_10/informatika/Informatika-BS-KLS-X.pdf"
+    },
+    {
+      "filename": "Informatika-KLS-X-Sem-1.pdf",
+      "subject": "informatika",
+      "grade": "kelas_10",
+      "type": "textbook_semester1",
+      "source": "BSE Kemdikbud",
+      "license": "Open Educational Resource",
+      "s3_key": "raw-pdf/kelas_10/informatika/Informatika-KLS-X-Sem-1.pdf"
+    },
+    {
+      "filename": "INFORMATIKA-SMA-X-ANALISIS-DATA.pdf",
+      "subject": "informatika",
+      "grade": "kelas_10",
+      "type": "specialized_module",
+      "topic": "data_analysis",
+      "source": "BSE Kemdikbud",
+      "license": "Open Educational Resource",
+      "s3_key": "raw-pdf/kelas_10/informatika/INFORMATIKA-SMA-X-ANALISIS-DATA.pdf"
+    },
+    {
+      "filename": "Informatika-untuk-SMK-MAK-Kelas-X-Semester-1.pdf",
+      "subject": "informatika",
+      "grade": "kelas_10",
+      "type": "textbook_smk_sem1",
+      "source": "BSE Kemdikbud",
+      "license": "Open Educational Resource",
+      "s3_key": "raw-pdf/kelas_10/informatika/Informatika-untuk-SMK-MAK-Kelas-X-Semester-1.pdf"
+    },
+    {
+      "filename": "Informatika-untuk-SMK-MAK-Kelas-X-Semester-2.pdf",
+      "subject": "informatika",
+      "grade": "kelas_10",
+      "type": "textbook_smk_sem2",
+      "source": "BSE Kemdikbud",
+      "license": "Open Educational Resource",
+      "s3_key": "raw-pdf/kelas_10/informatika/Informatika-untuk-SMK-MAK-Kelas-X-Semester-2.pdf"
+    },
+    {
+      "filename": "Modul-Pengenalan-Perangkat-TIK-Dasar.pdf",
+      "subject": "informatika",
+      "grade": "kelas_10",
+      "type": "module",
+      "topic": "basic_ict",
+      "source": "BSE Kemdikbud",
+      "license": "Open Educational Resource",
+      "s3_key": "raw-pdf/kelas_10/informatika/Modul-Pengenalan-Perangkat-TIK-Dasar.pdf"
+    },
+    {
+      "filename": "ModulBahanBelajar_Informatika_2021_Pembelajaran 1.pdf",
+      "subject": "informatika",
+      "grade": "kelas_10",
+      "type": "learning_module",
+      "year": "2021",
+      "source": "BSE Kemdikbud",
+      "license": "Open Educational Resource",
+      "s3_key": "raw-pdf/kelas_10/informatika/ModulBahanBelajar_Informatika_2021_Pembelajaran 1.pdf"
+    },
+    {
+      "filename": "Smk-Informatika-BS-KLS-X.pdf",
+      "subject": "informatika",
+      "grade": "kelas_10",
+      "type": "student_book_smk",
+      "source": "BSE Kemdikbud",
+      "license": "Open Educational Resource",
+      "s3_key": "raw-pdf/kelas_10/informatika/Smk-Informatika-BS-KLS-X.pdf"
+    }
+  ],
+  "metadata": {
+    "project": "OpenClass Nexus AI",
+    "purpose": "Educational content inventory for AI tutoring system",
+    "license_compliance": "All content verified as open educational resources from BSE Kemdikbud",
+    "target_audience": "Indonesian high school students (Kelas 10)",
+    "content_focus": "Informatika (Computer Science) curriculum materials",
+    "phase1_completion": "Dataset acquisition completed with 15 PDF files",
+    "storage_architecture": "AWS S3 with CloudFront distribution"
+  },
+  "processing_status": {
+    "raw_files": 15,
+    "processed_files": 0,
+    "embedded_files": 0,
+    "last_processing_date": null,
+    "phase1_status": "completed",
+    "next_phase": "data_processing_pipeline",
+    "s3_upload_status": "completed",
+    "last_upload_date": "2024-01-10T15:30:00",
+    "total_size_uploaded_mb": 140.4
+  },
+  "aws_configuration": {
+    "s3_bucket": "openclass-nexus-data",
+    "raw_pdf_prefix": "raw-pdf/",
+    "processed_text_prefix": "processed-text/",
+    "vector_db_prefix": "vector-db/",
+    "model_weights_prefix": "model-weights/",
+    "lifecycle_policy": "raw files deleted after 30 days"
+  }
+}
