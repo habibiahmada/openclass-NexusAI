@@ -52,7 +52,7 @@ graph TB
 ## 📊 Status Proyek Saat Ini
 
 ### ✅ **FASE 1 SELESAI** - Fondasi & Persiapan Data
-**Timeline**: Hari 1-3 | **Status**: 100% Complete | **Tanggal**: 10 Januari 2024
+**Timeline**: Hari 1-3 | **Status**: 100% Complete | **Tanggal**: 10 Januari 2026
 
 #### 🎉 Pencapaian Utama:
 - ✅ **15 File PDF Edukatif** berhasil diupload ke S3 (140.6 MB)
@@ -72,7 +72,7 @@ graph TB
 | **Project Structure** | ✅ Complete | Modular architecture |
 
 ### 🚧 **FASE 2 BERIKUTNYA** - Backend Infrastructure & Knowledge Engineering
-**Timeline**: Hari 4-7 | **Status**: Ready to Start | **Target**: 17 Januari 2024
+**Timeline**: Hari 4-7 | **Status**: Ready to Start | **Target**: 17 Januari 2026
 
 ## 🚀 Quick Start & Installation
 
@@ -88,7 +88,7 @@ graph TB
 #### 1. Clone Repository dan Setup Environment
 ```bash
 # Clone repository
-git clone <repository-url>
+git clone https://github.com/habibiahmada/openclass-NexusAI.git
 cd openclass-nexus
 
 # Create dan activate virtual environment
@@ -192,25 +192,6 @@ For detailed structure, see [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md).
 - **Storage**: AWS S3 (`s3://openclass-nexus-data/raw-pdf/`)
 - **Sumber**: BSE Kemdikbud (Open Educational Resources)
 - **Lisensi**: Terverifikasi open/free untuk penggunaan edukatif
-
-### 📋 Detail File Dataset
-| No | Nama File | Tipe | Size (MB) | Deskripsi |
-|----|-----------|------|-----------|-----------|
-| 1 | `20221-informatika.pdf` | Textbook | 12.5 | Buku teks utama Informatika |
-| 2 | `70764605INFORMATIKASMK.pdf` | Textbook SMK | 24.0 | Buku khusus SMK |
-| 3 | `Buku Murid Informatika - Semester 1 Bab 4.pdf` | Student Book | 1.5 | Buku siswa semester 1 |
-| 4 | `Buku-Panduan-Informatika-untuk-SMA-Kelas-X.pdf` | Teacher Guide | 3.2 | Panduan guru SMA |
-| 5 | `Buku-Panduan-Informatika-untuk-SMK-MAK-Kelas-X.pdf` | Teacher Guide | 5.9 | Panduan guru SMK |
-| 6 | `informatika-31320.pdf` | Textbook | 9.2 | Buku teks alternatif |
-| 7 | `Informatika-BG-KLS-X.pdf` | Teacher Guide | 2.9 | Buku guru kelas X |
-| 8 | `Informatika-BS-KLS-X.pdf` | Student Book | 4.9 | Buku siswa kelas X |
-| 9 | `Informatika-KLS-X-Sem-1.pdf` | Textbook | 20.0 | Semester 1 lengkap |
-| 10 | `INFORMATIKA-SMA-X-ANALISIS-DATA.pdf` | Module | 1.1 | Modul analisis data |
-| 11 | `Informatika-untuk-SMK-MAK-Kelas-X-Semester-1.pdf` | SMK Textbook | 20.4 | SMK semester 1 |
-| 12 | `Informatika-untuk-SMK-MAK-Kelas-X-Semester-2.pdf` | SMK Textbook | 12.1 | SMK semester 2 |
-| 13 | `Modul-Pengenalan-Perangkat-TIK-Dasar.pdf` | Module | 2.0 | Modul TIK dasar |
-| 14 | `ModulBahanBelajar_Informatika_2021_Pembelajaran 1.pdf` | Learning Module | 9.2 | Modul pembelajaran 2021 |
-| 15 | `Smk-Informatika-BS-KLS-X.pdf` | SMK Student Book | 11.9 | Buku siswa SMK |
 
 ### 🔍 Akses Dataset
 ```bash
@@ -581,7 +562,7 @@ python scripts/test_aws_connection.py
 ## 📞 Contact & Support
 
 ### 👥 Team Information
-- **Project Name**: OpenClass Nexus AI
+- **Project Name**: NexusAI
 - **Purpose**: Educational AI Assistant untuk Sekolah Indonesia
 - **Target**: SMA/SMK dengan konektivitas internet terbatas
 - **Development Phase**: Fase 1 Complete, Fase 2 Ready
