@@ -103,7 +103,7 @@
 ### ✅ AWS CLI Configuration
 - [x] Install AWS CLI: `pip install awscli`
 - [x] Configure credentials: `aws configure`
-- [x] Input: Access Key, Secret Key, Region (us-east-1), Output format (json)
+- [x] Input: Access Key, Secret Key, Region (ap-southeast-2), Output format (json)
 - [x] Test connection: `aws sts get-caller-identity`
 
 **Verification:**

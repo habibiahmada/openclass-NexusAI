@@ -41,13 +41,12 @@ openclass-nexus/
 │   ├── processed/               # Processed text content
 │   │   └── .gitignore
 │   └── vector_db/               # ChromaDB vector database
-│       └── .gitignore
-│
-├── raw_dataset/                 # Educational content structure (PDFs in S3)
-│   ├── README.md                # S3 storage explanation
-│   └── kelas_10/
-│       └── informatika/         # Computer Science materials
-│           └── .gitkeep         # Maintains folder structure (PDFs in S3)
+│   │   └── .gitignore
+│   └──raw_dataset/                 # Educational content structure (PDFs in S3)
+│      ├── README.md                # S3 storage explanation
+│      └── kelas_10/
+│          └── informatika/         # Computer Science materials
+│               └── .gitkeep         # Maintains folder structure (PDFs in S3)
 │
 ├── models/                      # AI model storage (not tracked)
 │   └── .gitignore
@@ -95,7 +94,7 @@ openclass-nexus/
 - **Organized structure**: Proper folder hierarchy maintained
 - **Legal compliance**: All materials verified as open educational resources
 - **Metadata system**: Complete inventory with S3 keys in `dataset_inventory.json`
-- **Upload completed**: 2024-01-10, all files verified accessible
+- **Upload completed**: 2026-01-10, all files verified accessible
 
 ### ✅ AWS Infrastructure (Langkah 1.2)
 - **Cost control**: $1.00 budget with alerts
@@ -140,4 +139,4 @@ Ready to proceed with:
 
 **Status**: Phase 1 Complete ✅  
 **Next Phase**: Backend Infrastructure & Knowledge Engineering  
-**Last Updated**: 2024-01-10
+**Last Updated**: 2026-01-10

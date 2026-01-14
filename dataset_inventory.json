@@ -1,7 +1,7 @@
 {
   "version": "1.0",
-  "created_date": "2024-01-10",
-  "last_updated": "2024-01-10",
+  "created_date": "2026-01-10",
+  "last_updated": "2026-01-10",
   "total_files": 15,
   "storage_location": "s3://openclass-nexus-data/raw-pdf/kelas_10/informatika/",
   "subjects": {
@@ -170,7 +170,7 @@
     "phase1_status": "completed",
     "next_phase": "data_processing_pipeline",
     "s3_upload_status": "completed",
-    "last_upload_date": "2024-01-10T15:30:00",
+    "last_upload_date": "2026-01-10T15:30:00",
     "total_size_uploaded_mb": 140.4
   },
   "aws_configuration": {

@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-"""
-Download Educational PDFs from S3
-Downloads PDF files from S3 bucket to local directory for development
-"""
-
 import boto3
 import json
 import os

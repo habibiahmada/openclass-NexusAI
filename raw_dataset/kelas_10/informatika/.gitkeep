@@ -1,3 +1,0 @@
-# This file keeps the directory structure in git
-# Actual PDF files are stored in S3, not in this repository
-# See ../../../README.md for details on S3 storage structure

@@ -50,7 +50,7 @@ This guide will help you set up the development environment for OpenClass Nexus 
    Enter your:
    - AWS Access Key ID
    - AWS Secret Access Key
-   - Default region: `us-east-1`
+   - Default region: `ap-southeast-2`
    - Default output format: `json`
 
 3. **Test AWS Connection**
@@ -161,7 +161,7 @@ Ensure your AWS user has these permissions:
 
 #### Region Issues
 - Bedrock is not available in all regions
-- Use `us-east-1` for maximum service availability
+- Use `ap-southeast-2` for maximum service availability
 - Update `.env` file if you need to change regions
 
 #### Bucket Name Conflicts

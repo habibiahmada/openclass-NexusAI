@@ -22,7 +22,7 @@ class AppConfig:
         self.max_context_length = int(os.getenv('MAX_CONTEXT_LENGTH', '2048'))
         self.max_response_tokens = int(os.getenv('MAX_RESPONSE_TOKENS', '512'))
         self.n_threads = int(os.getenv('N_THREADS', '4'))
-        self.n_gpu_layers = int(os.getenv('N_GPU_LAYERS', '0'))  # CPU only by default
+        self.n_gpu_layers = int(os.getenv('N_GPU_LAYERS', '0'))
         
         # Text Processing Settings
         self.chunk_size = int(os.getenv('CHUNK_SIZE', '800'))
@@ -35,12 +35,7 @@ class AppConfig:
         
         # Supported subjects
         self.supported_subjects = [
-            'Matematika',
-            'IPA',
-            'Bahasa Indonesia',
-            'Fisika',
-            'Kimia',
-            'Biologi'
+            'Informatika',
         ]
         
         # UI Configuration

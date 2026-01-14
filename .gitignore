@@ -56,8 +56,8 @@ data/processed/
 *.log
 
 # Raw dataset - PDFs should be in S3, not local
-raw_dataset/*.pdf
-raw_dataset/**/*.pdf
+data/raw_dataset/*.pdf
+data/raw_dataset/**/**/*.pdf
 
 # AWS credentials (should use AWS CLI or IAM roles)
 aws-credentials.txt
@@ -66,3 +66,4 @@ AWS_ACCESS.txt
 # Temporary files
 *.tmp
 *.temp
+.hypothesis

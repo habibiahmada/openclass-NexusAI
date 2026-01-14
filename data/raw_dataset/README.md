@@ -71,7 +71,7 @@ raw_dataset/
 
 All 15 PDF files (140.6 MB total) have been successfully uploaded to S3:
 - Location: `s3://openclass-nexus-data/raw-pdf/kelas_10/informatika/`
-- Upload completed: 2024-01-10
+- Upload completed: 2026-01-10
 - All files verified and accessible
 
 ### Cost Management

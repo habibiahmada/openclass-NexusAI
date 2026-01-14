@@ -46,5 +46,5 @@ For legal questions or concerns:
 - Contact: [Your Contact Information]
 
 ---
-Generated: 2024-01-10
-Last Updated: 2024-01-10
+Generated: 2026-01-10
+Last Updated: 2026-01-10

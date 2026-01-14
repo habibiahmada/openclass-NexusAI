@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-"""
-Sample Data Download Script
-Downloads sample educational content for development and testing
-"""
-
 import os
 import requests
 import json
@@ -139,7 +133,7 @@ def update_inventory(content_info, file_path):
     else:
         inventory = {
             "version": "1.0",
-            "created_date": "2024-01-01",
+            "created_date": "2026-01-01",
             "total_files": 0,
             "subjects": {},
             "files": []
@@ -154,7 +148,7 @@ def update_inventory(content_info, file_path):
         "chapter": content_info["chapter"],
         "description": content_info["description"],
         "file_size": file_path.stat().st_size if file_path.exists() else 0,
-        "download_date": "2024-01-01",
+        "download_date": "2026-01-01",
         "license": "Open Educational Resource",
         "source": "Sample Data"
     }
@@ -224,8 +218,8 @@ For legal questions or concerns:
 - Contact: [Your Contact Information]
 
 ---
-Generated: 2024-01-01
-Last Updated: 2024-01-01
+Generated: 2026-01-01
+Last Updated: 2026-01-01
 """
     
     with open("legal_compliance.md", 'w', encoding='utf-8') as f:

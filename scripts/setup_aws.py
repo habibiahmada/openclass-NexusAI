@@ -26,7 +26,7 @@ def create_s3_bucket():
             print(f"ℹ️  S3 bucket '{bucket_name}' already exists")
         except Exception:
             # Create bucket if it doesn't exist
-            if aws_config.region == 'us-east-1':
+            if aws_config.region == 'ap-southeast-2':
                 s3.create_bucket(Bucket=bucket_name)
             else:
                 s3.create_bucket(
