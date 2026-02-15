@@ -1,0 +1,12 @@
+{
+  "provider": "azure",
+  "resource_group": "openclass-rg",
+  "location": "East US",
+  "vm_size": "Standard_B2s",
+  "storage_account": "openclassstorage",
+  "network_security_group": "openclass-nsg",
+  "environment_variables": {
+    "OPENCLASS_ENV": "azure",
+    "AZURE_LOCATION": "eastus"
+  }
+}

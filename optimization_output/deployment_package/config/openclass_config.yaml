@@ -1,0 +1,58 @@
+app_name: OpenClass Nexus AI
+cache_dir: ./cache
+config_dir: ./config
+debug_mode: false
+educational_subjects:
+- Informatika
+- Matematika
+- Fisika
+- Kimia
+- Biologi
+- Bahasa Indonesia
+- Bahasa Inggris
+hardware_profile:
+  architecture: AMD64
+  cpu_cores: 4
+  cpu_frequency_ghz: 2.419
+  cpu_threads: 8
+  performance_tier: medium
+  profile_name: medium_performance
+  recommended_batch_size: 384
+  recommended_context_size: 3072
+  recommended_memory_limit_mb: 3943
+  recommended_threads: 6
+  total_memory_gb: 7.701496124267578
+inference_config:
+  batch_size: 384
+  max_tokens: 256
+  memory_limit_mb: 3072
+  n_ctx: 3072
+  n_gpu_layers: 0
+  n_threads: 6
+  repeat_penalty: 1.1
+  streaming: true
+  temperature: 0.5
+  top_k: 40
+  top_p: 0.9
+  use_mlock: false
+  use_mmap: true
+log_level: INFO
+logs_dir: ./logs
+model_config:
+  cache_dir: ./models
+  checksum: null
+  context_window: 4096
+  educational_optimized: true
+  file_size_mb: 2500
+  gguf_filename: Llama-3.2-3B-Instruct-Q4_K_M.gguf
+  gguf_repo: bartowski/Llama-3.2-3B-Instruct-GGUF
+  local_path: models\Llama-3.2-3B-Instruct-Q4_K_M.gguf
+  model_id: meta-llama/Llama-3.2-3B-Instruct
+  quantization_format: Q4_K_M
+  supports_indonesian: true
+models_dir: ./models
+response_language: indonesian
+supported_languages:
+- indonesian
+- english
+version: 3.0.0

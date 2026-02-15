@@ -1,8 +1,3 @@
-"""
-Bedrock Embeddings Client
-Handles vector embeddings generation using AWS Bedrock Titan model
-"""
-
 import json
 import time
 from typing import List, Dict, Any

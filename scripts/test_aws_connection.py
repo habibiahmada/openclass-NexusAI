@@ -1,9 +1,3 @@
-#!/usr/bin/env python3
-"""
-AWS Connection Test Script
-Tests connectivity to all AWS services used by OpenClass Nexus AI
-"""
-
 import sys
 import json
 import os

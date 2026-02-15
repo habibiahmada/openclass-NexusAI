@@ -1,9 +1,3 @@
-"""Metadata management for text chunks.
-
-This module provides functionality to extract metadata from file paths
-and enrich text chunks with metadata for source attribution.
-"""
-
 import re
 import uuid
 from dataclasses import dataclass

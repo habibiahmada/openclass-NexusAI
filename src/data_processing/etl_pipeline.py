@@ -1,9 +1,3 @@
-"""ETL Pipeline Orchestrator
-
-This module orchestrates the complete ETL process from PDF extraction
-to ChromaDB storage, handling all phases in sequence.
-"""
-
 import logging
 import time
 from dataclasses import dataclass, field

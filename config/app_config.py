@@ -1,8 +1,3 @@
-"""
-Application Configuration
-Central configuration management for the OpenClass Nexus AI application
-"""
-
 import os
 from dotenv import load_dotenv
 

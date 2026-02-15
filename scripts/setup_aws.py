@@ -1,15 +1,8 @@
-#!/usr/bin/env python3
-"""
-AWS Setup Script
-Automates the setup of AWS infrastructure for OpenClass Nexus AI
-"""
-
 import boto3
 import json
 import sys
 import os
 
-# Add current directory to Python path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from config.aws_config import aws_config
@@ -205,7 +198,7 @@ def validate_setup():
 
 def main():
     """Main setup function"""
-    print("🚀 Setting up AWS infrastructure for OpenClass Nexus AI")
+    print("Setting up AWS infrastructure for OpenClass Nexus AI")
     print("=" * 60)
     
     # Validate credentials first

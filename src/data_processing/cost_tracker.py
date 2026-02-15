@@ -1,9 +1,3 @@
-"""Cost Tracking Module
-
-This module tracks AWS costs during ETL pipeline processing,
-including Bedrock token usage and S3 data transfer.
-"""
-
 import json
 import logging
 from dataclasses import dataclass, field, asdict

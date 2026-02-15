@@ -1,9 +1,3 @@
-"""ChromaDB vector store management.
-
-This module provides functionality to store and manage vector embeddings
-in ChromaDB for semantic search.
-"""
-
 import chromadb
 from chromadb.config import Settings
 from dataclasses import dataclass

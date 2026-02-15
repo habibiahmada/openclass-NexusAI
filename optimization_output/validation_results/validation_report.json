@@ -1,0 +1,24 @@
+{
+  "components_validated": 4,
+  "validation_passed": false,
+  "issues_found": [
+    "Response time exceeds 5 second threshold",
+    "Memory usage exceeds 4GB threshold",
+    "Curriculum alignment below 85% threshold",
+    "model_manager: Failed to initialize: argument should be a str or an os.PathLike object where __fspath__ returns a str, not 'ConfigurationManager'",
+    "inference_engine: Failed to initialize: InferenceEngine.__init__() missing 1 required positional argument: 'config'",
+    "rag_pipeline: Failed to initialize: RAGPipeline.__init__() missing 1 required positional argument: 'inference_engine'",
+    "System integration test failed"
+  ],
+  "recommendations": [
+    "Optimize model inference or increase hardware resources",
+    "Optimize memory usage or increase available RAM",
+    "Improve educational content validation and model fine-tuning",
+    "model_manager: Check model files and dependencies",
+    "inference_engine: Check inference engine configuration",
+    "rag_pipeline: Check RAG pipeline configuration",
+    "Check component interactions and data flow"
+  ],
+  "overall_score": 0.0,
+  "timestamp": "2026-01-28T20:11:46.489211"
+}

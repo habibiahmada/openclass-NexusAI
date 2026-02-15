@@ -1,13 +1,7 @@
-"""
-AWS Configuration Management
-Handles AWS service configurations and credentials
-"""
-
 import os
 import boto3
 from dotenv import load_dotenv
 
-# Load environment variables
 load_dotenv()
 
 class AWSConfig:

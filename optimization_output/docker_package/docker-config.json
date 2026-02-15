@@ -1,0 +1,16 @@
+{
+  "image_name": "openclass-nexus-ai",
+  "version": "latest",
+  "ports": [
+    "8000:8000"
+  ],
+  "volumes": [
+    "./data:/app/data",
+    "./models:/app/models",
+    "./config:/app/config"
+  ],
+  "environment": {
+    "OPENCLASS_ENV": "docker",
+    "OPENCLASS_LOG_LEVEL": "INFO"
+  }
+}
