@@ -1,9 +1,3 @@
-"""Unit tests for CloudFront Manager.
-
-These tests verify specific examples and edge cases for CloudFront distribution
-management functionality.
-"""
-
 import time
 from unittest.mock import Mock, patch, MagicMock
 

@@ -1,11 +1,3 @@
-"""
-Documentation Generator
-
-This module provides comprehensive documentation generation capabilities for
-OpenClass Nexus AI, including user guides, API documentation, deployment guides,
-and troubleshooting documentation in multiple languages.
-"""
-
 import ast
 import inspect
 import logging
@@ -67,10 +59,14 @@ class DocumentationGenerator:
         Raises:
             ValueError: If language is not supported
         """
-        if language not in self.supported_languages:
+        if language.lower() not in self.supported_languages:
             raise ValueError(f"Language '{language}' not supported. Available: {self.supported_languages}")
         
+        language = language.lower()
         logger.info(f"Generating user guide in {language}")
+        
+        # Ensure output directory exists
+        self.output_dir.mkdir(parents=True, exist_ok=True)
         
         # Generate content based on language
         if language == "indonesian":
@@ -652,6 +648,7 @@ For further assistance:
         content = self._generate_api_documentation_content(api_functions)
         
         # Save to file
+        self.output_dir.mkdir(parents=True, exist_ok=True)
         filename = "api_documentation.md"
         file_path = self.output_dir / filename
         
@@ -904,6 +901,7 @@ print(result)
         content = self._generate_deployment_guide_content()
         
         # Save to file
+        self.output_dir.mkdir(parents=True, exist_ok=True)
         filename = "deployment_guide.md"
         file_path = self.output_dir / filename
         
@@ -1435,6 +1433,7 @@ For deployment support:
         content = self._generate_troubleshooting_content()
         
         # Save to file
+        self.output_dir.mkdir(parents=True, exist_ok=True)
         filename = "troubleshooting_guide.md"
         file_path = self.output_dir / filename
         
@@ -1585,11 +1584,11 @@ CONCURRENT_QUERIES = 1  # Reduce from default 3
 **Solution 2 - Enable Model Quantization**:
 ```python
 # Add to model configuration
-MODEL_CONFIG = {
+MODEL_CONFIG = {{
     "load_in_8bit": True,  # Enable 8-bit quantization
     "device_map": "auto",
     "torch_dtype": "float16"
-}
+}}
 ```
 
 **Solution 3 - Monitor Memory Usage**:
@@ -1691,25 +1690,25 @@ python scripts/validate_educational_content.py
 **Solution 2 - Adjust Model Parameters**:
 ```python
 # Fine-tune generation parameters
-MODEL_PARAMS = {
+MODEL_PARAMS = {{
     "temperature": 0.3,      # Lower for more focused responses
     "top_p": 0.8,           # Reduce randomness
     "max_length": 1024,     # Limit response length
     "do_sample": True,
     "pad_token_id": tokenizer.eos_token_id
-}
+}}
 ```
 
 **Solution 3 - Enable Educational Validation**:
 ```python
 # Enable strict educational validation
-EDUCATIONAL_VALIDATION = {
+EDUCATIONAL_VALIDATION = {{
     "enable_curriculum_check": True,
     "min_curriculum_score": 0.85,
     "enable_language_check": True,
     "min_language_score": 0.80,
     "require_source_attribution": True
-}
+}}
 ```
 
 ### Issue: Concurrent Processing Failures
@@ -1729,12 +1728,12 @@ QUEUE_MAX_SIZE = 100        # Limit request queue
 **Solution 2 - Implement Request Queuing**:
 ```python
 # Add request queuing with Redis
-REDIS_CONFIG = {
+REDIS_CONFIG = {{
     "host": "localhost",
     "port": 6379,
     "db": 0,
     "max_connections": 10
-}
+}}
 ENABLE_REQUEST_QUEUE = True
 ```
 
