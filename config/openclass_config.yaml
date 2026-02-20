@@ -4,12 +4,6 @@ config_dir: ./config
 debug_mode: false
 educational_subjects:
 - Informatika
-- Matematika
-- Fisika
-- Kimia
-- Biologi
-- Bahasa Indonesia
-- Bahasa Inggris
 hardware_profile:
   architecture: AMD64
   cpu_cores: 4

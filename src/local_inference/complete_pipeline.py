@@ -516,13 +516,12 @@ class CompletePipeline:
         
         try:
             self.vector_db = ChromaDBManager(
-                db_path=self.config.chroma_db_path,
-                collection_name=self.config.chroma_collection_name
+                persist_directory=self.config.chroma_db_path
             )
             
             # Ensure collection exists
             try:
-                collection = self.vector_db.get_collection()
+                collection = self.vector_db.get_collection(self.config.chroma_collection_name)
                 doc_count = self.vector_db.count_documents()
                 logger.info(f"Vector database initialized with {doc_count} documents")
             except ValueError:
@@ -537,7 +536,7 @@ class CompletePipeline:
         logger.info("Initializing inference engine...")
         
         # Get model path
-        model_path = self.model_config.get_local_path()
+        model_path = self.model_config.get_model_path()
         if not model_path or not model_path.exists():
             raise FileNotFoundError(f"Model file not found: {model_path}")
         
@@ -546,8 +545,9 @@ class CompletePipeline:
         
         # Apply resource-based adjustments
         if self.thread_manager:
+            memory_stats = self.memory_monitor.get_system_memory()
             inference_config.n_threads = self.thread_manager.get_thread_config(
-                available_memory_mb=self.memory_monitor.get_available_memory()
+                available_memory_mb=memory_stats.available_mb
             )
         
         # Create inference engine
@@ -630,9 +630,7 @@ class CompletePipeline:
         logger.info("Initializing educational validation...")
         
         try:
-            self.educational_validator = EducationalContentValidator(
-                target_language=self.config.target_language
-            )
+            self.educational_validator = EducationalContentValidator()
             logger.info("Educational validation initialized")
         except Exception as e:
             logger.warning(f"Educational validation not available: {e}")
@@ -647,6 +645,7 @@ class CompletePipeline:
         
         self.degradation_manager = GracefulDegradationManager(
             memory_monitor=self.memory_monitor,
+            thread_manager=self.thread_manager,
             performance_tracker=self.performance_tracker
         )
         

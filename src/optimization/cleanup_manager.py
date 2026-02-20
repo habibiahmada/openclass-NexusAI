@@ -768,6 +768,8 @@ class ProjectCleanupManager(OptimizationLoggerMixin):
         self.config = config
         self.file_cleanup_engine = FileCleanupEngine(config)
         self.structure_optimizer = DirectoryStructureOptimizer(config)
+        # Add alias for backward compatibility
+        self.directory_optimizer = self.structure_optimizer
         
         self.log_info("Project cleanup manager initialized")
     

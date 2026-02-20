@@ -52,7 +52,9 @@ Thumbs.db
 models/*.gguf
 models/*.bin
 data/vector_db/
-data/processed/
+data/processed/text/
+data/processed/metadata/*.json
+data/processed/metadata/*.txt
 *.log
 
 # Raw dataset - PDFs should be in S3, not local
@@ -66,4 +68,16 @@ AWS_ACCESS.txt
 # Temporary files
 *.tmp
 *.temp
-.hypothesis
+.hypothesis/
+.pytest_cache/
+
+# Optimization output
+optimization_output/
+
+# Backups (keep structure, ignore content)
+backups/*.json
+backups/*.db
+backups/*.sqlite3
+backups/vector_db_*/
+backups/.env.backup
+backups/config_backup/

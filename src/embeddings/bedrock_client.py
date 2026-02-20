@@ -153,30 +153,40 @@ class BedrockEmbeddingsClient:
                     embedding = self.generate_embedding(text)
                     embeddings.append(embedding)
                 except BedrockAPIError as e:
-                    logger.error(f"Failed to generate embedding for text: {e}")
+                    logger.error(f"Failed to generate embedding: {e}")
                     raise
+                
+                # Add delay between requests to avoid rate limiting (increased to 2s)
+                time.sleep(2)
+            
+            # Add longer delay between batches (increased to 5s)
+            if i + batch_size < len(texts):
+                time.sleep(5)
         
         logger.info(f"Successfully generated {len(embeddings)} embeddings")
         return embeddings
     
-    def get_token_usage(self) -> int:
-        """Get total tokens processed for cost calculation.
+    def get_token_count(self) -> int:
+        """Get total tokens processed.
         
         Returns:
             Total number of tokens processed
         """
         return self.total_tokens_processed
     
-    def calculate_cost(self) -> float:
-        """Calculate estimated cost based on token usage.
+    def estimate_cost(self, token_count: int = None) -> float:
+        """Estimate cost for token processing.
         
-        Titan Text Embeddings v2 pricing: $0.0001 per 1K tokens
-        
+        Args:
+            token_count: Number of tokens (uses total if not provided)
+            
         Returns:
             Estimated cost in USD
         """
+        tokens = token_count or self.total_tokens_processed
+        # Titan Text Embeddings v2: $0.0001 per 1K tokens
         cost_per_1k_tokens = 0.0001
-        return (self.total_tokens_processed / 1000) * cost_per_1k_tokens
+        return (tokens / 1000) * cost_per_1k_tokens
     
     def reset_usage(self):
         """Reset token usage counter"""

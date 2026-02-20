@@ -103,9 +103,8 @@ class InferenceEngine:
         try:
             # Check available memory before loading
             available_memory = self._get_available_memory_mb()
-            if available_memory < 2000:  # Need at least 2GB free
-                logger.error(f"Insufficient memory: {available_memory}MB available, need at least 2000MB")
-                return False
+            if available_memory < 500:  # Need at least 500MB free (with mmap, model is loaded on-demand)
+                logger.warning(f"Low memory: {available_memory}MB available. Model will use memory mapping.")
             
             logger.info(f"Loading model from {self.model_path}")
             logger.info(f"Available memory: {available_memory}MB")

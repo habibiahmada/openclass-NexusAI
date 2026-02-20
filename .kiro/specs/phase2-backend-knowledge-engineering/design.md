@@ -18,7 +18,7 @@ The design follows a modular pipeline architecture where each component has a si
 ### System Components
 
 ```mermaid
-graph TB
+graph LR
     subgraph "Input Layer"
         PDF[PDF Files<br/>data/raw_dataset/]
     end
@@ -54,6 +54,15 @@ graph TB
     style MM fill:#ccccff
     style VG fill:#ffffcc
     style VDB fill:#ffccff
+```
+
+```mermaid
+graph LR
+    A[Feature Branch] -- PR --> B(Develop Branch)
+    B -- PR --> C{Reviewer Approved?}
+    C -- Yes --> D(Main Branch / Production)
+    C -- No --> A
+
 ```
 
 ### Data Flow

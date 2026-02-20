@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClass Nexus AI — Mode Siswa</title>
+    <link rel="stylesheet" href="/static/css/variables.css">
+    <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="/static/css/components.css">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link rel="stylesheet" href="/static/css/chat.css">
+</head>
+
+<body>
+    <!-- Offline Indicator -->
+    <div id="offline-indicator" class="offline-badge">
+        <span class="status-dot"></span>
+        Offline Aktif
+    </div>
+
+    <div class="dashboard-page">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="dashboard-logo">
+                <div class="logo-mark">N</div>
+                <h1>Nexus AI</h1>
+                <span class="role-badge">Siswa</span>
+            </div>
+            <div class="dashboard-user">
+                <span class="user-name" id="user-name">Siswa</span>
+                <button class="btn btn-danger btn-sm" onclick="handleLogout()">Keluar</button>
+            </div>
+        </header>
+
+        <!-- Chat Layout -->
+        <div class="chat-layout">
+            <!-- Sidebar -->
+            <aside class="chat-sidebar">
+                <div class="sidebar-section">
+                    <h3>Mata Pelajaran</h3>
+                    <select id="subject-filter" class="filter-select">
+                        <option value="all">Semua Mata Pelajaran</option>
+                        <option value="informatika">Informatika</option>
+                        <option value="matematika">Matematika</option>
+                        <option value="ipa">IPA</option>
+                        <option value="bahasa">Bahasa Indonesia</option>
+                    </select>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Aksi Cepat</h3>
+                    <div class="quick-actions">
+                        <button class="action-btn" data-action="ringkas">
+                            <span class="action-icon">📝</span>
+                            Ringkas Materi
+                        </button>
+                        <button class="action-btn" data-action="contoh">
+                            <span class="action-icon">💡</span>
+                            Contoh Soal
+                        </button>
+                        <button class="action-btn" data-action="latihan">
+                            <span class="action-icon">✏️</span>
+                            Latihan
+                        </button>
+                        <button class="action-btn" data-action="jelaskan">
+                            <span class="action-icon">🔍</span>
+                            Jelaskan Konsep
+                        </button>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Info</h3>
+                    <div class="info-box">
+                        <p>Sistem ini bekerja sepenuhnya offline. Semua data tersimpan di perangkat lokal.</p>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Chat Area -->
+            <main class="chat-main">
+                <div id="chat-messages" class="messages-container">
+                    <!-- Welcome -->
+                    <div class="message assistant">
+                        <div class="message-avatar">🤖</div>
+                        <div class="message-content">
+                            <p>Halo! 👋 Saya AI Tutor untuk membantu belajar sesuai <strong>Kurikulum Nasional</strong>.
+                            </p>
+                            <p style="margin-top:8px">Silakan tanya apa saja tentang pelajaran Anda. Saya akan menjawab
+                                berdasarkan buku dan materi resmi.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input -->
+                <div class="chat-input-area">
+                    <textarea id="user-input" class="chat-input" placeholder="Ketik pertanyaan Anda di sini..."
+                        rows="2"></textarea>
+                    <button id="send-btn" class="send-btn">
+                        <span>Kirim</span>
+                        <span>➤</span>
+                    </button>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="/static/js/common.js"></script>
+    <script src="/static/js/siswa.js"></script>
+</body>
+
+</html>

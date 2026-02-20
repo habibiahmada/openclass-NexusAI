@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClass Nexus AI — AI Tutor Offline untuk Pendidikan Indonesia</title>
+    <meta name="description" content="Sistem AI Tutor berbasis Kurikulum Nasional yang bekerja sepenuhnya offline. Diakses via browser, tanpa internet, tanpa instalasi di perangkat siswa.">
+    <link rel="stylesheet" href="/static/css/variables.css">
+    <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="/static/css/components.css">
+    <link rel="stylesheet" href="/static/css/landing.css">
+</head>
+<body>
+    <!-- Offline Indicator -->
+    <div id="offline-indicator" class="offline-badge">
+        <span class="status-dot"></span>
+        Offline Aktif
+    </div>
+
+    <!-- ═══════ NAVBAR ═══════ -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-logo">
+            <div class="logo-mark">N</div>
+            <span>Nexus AI</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#features">Fitur</a></li>
+            <li><a href="#how-it-works">Cara Kerja</a></li>
+            <li><a href="#architecture">Arsitektur</a></li>
+            <li><a href="#roles">Peran</a></li>
+            <li><a href="#impact">Dampak</a></li>
+        </ul>
+        <div class="nav-cta">
+            <button class="btn btn-secondary btn-sm" onclick="scrollToRoles()">Masuk</button>
+            <button class="btn btn-primary btn-sm" onclick="scrollToRoles()">Mulai Belajar</button>
+        </div>
+        <button class="nav-toggle" id="nav-toggle" aria-label="Menu">☰</button>
+    </nav>
+
+    <!-- ═══════ HERO ═══════ -->
+    <section class="hero" id="hero">
+        <div class="hero-bg">
+            <div class="hero-orb hero-orb-1"></div>
+            <div class="hero-orb hero-orb-2"></div>
+            <div class="hero-orb hero-orb-3"></div>
+        </div>
+        <div class="hero-content fade-up">
+            <div class="hero-badge">
+                <span class="dot"></span>
+                SDG 4 — Quality Education
+            </div>
+            <h1>
+                AI Tutor <span class="highlight">Offline</span><br>
+                untuk Pendidikan Indonesia
+            </h1>
+            <p class="hero-description">
+                Sistem pembelajaran berbasis AI yang bekerja sepenuhnya offline.
+                Diakses lewat browser, tanpa internet, tanpa instalasi di perangkat siswa.
+                Redistribusi kecerdasan ke setiap sudut Indonesia.
+            </p>
+            <div class="hero-actions">
+                <button class="btn btn-primary btn-lg" onclick="scrollToRoles()">
+                    🚀 Mulai Belajar Sekarang
+                </button>
+                <a href="#how-it-works" class="btn btn-secondary btn-lg">
+                    Lihat Cara Kerja →
+                </a>
+            </div>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div class="number">100%</div>
+                    <div class="label">Offline</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="number">0</div>
+                    <div class="label">Install di Client</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="number">4GB</div>
+                    <div class="label">RAM Minimal</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="number">3</div>
+                    <div class="label">Mode Pengguna</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════ FEATURES ═══════ -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header fade-up">
+                <span class="section-label">Fitur Utama</span>
+                <h2>Mengapa OpenClass Nexus AI?</h2>
+                <p>Dirancang khusus untuk sekolah Indonesia dengan keterbatasan infrastruktur</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card fade-up">
+                    <div class="feature-icon offline">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    </div>
+                    <h3>100% Offline</h3>
+                    <p>Tidak memerlukan koneksi internet setelah instalasi awal. Semua data & model AI lokal.</p>
+                </div>
+                <div class="feature-card fade-up">
+                    <div class="feature-icon curriculum">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                    </div>
+                    <h3>Kurikulum Nasional</h3>
+                    <p>Berdasarkan buku BSE Kemdikbud resmi. Jawaban akurat sesuai standar pendidikan nasional.</p>
+                </div>
+                <div class="feature-card fade-up">
+                    <div class="feature-icon ai">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 10v2"/><circle cx="12" cy="16" r="2"/><path d="M12 18v2"/><path d="M7 20h10"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 6.34l1.41-1.41"/></svg>
+                    </div>
+                    <h3>AI Tutor Lokal</h3>
+                    <p>Model AI (GGUF) berjalan langsung di perangkat lokal dengan llama.cpp. Ringan & cepat.</p>
+                </div>
+                <div class="feature-card fade-up">
+                    <div class="feature-icon privacy">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <h3>Privacy First</h3>
+                    <p>Data siswa tidak pernah keluar dari perangkat. Tidak ada cloud, tidak ada tracking.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════ HOW IT WORKS ═══════ -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <div class="section-header fade-up">
+                <span class="section-label">Cara Kerja</span>
+                <h2>Mulai dalam 3 Langkah</h2>
+                <p>Setup mudah untuk IT sekolah, tanpa keahlian khusus</p>
+            </div>
+            <div class="steps-grid">
+                <div class="step-card fade-up">
+                    <div class="step-number">1</div>
+                    <h3>Install Server</h3>
+                    <p>Pasang OpenClass Nexus AI di 1 komputer sekolah (mini PC / laptop guru). Installer Windows atau Docker tersedia.</p>
+                </div>
+                <div class="step-card fade-up">
+                    <div class="step-number">2</div>
+                    <h3>Hubungkan via LAN</h3>
+                    <p>Siswa akses via WiFi / LAN intranet sekolah. Cukup buka browser — tidak perlu install apa pun di perangkat siswa.</p>
+                </div>
+                <div class="step-card fade-up">
+                    <div class="step-number">3</div>
+                    <h3>Mulai Belajar</h3>
+                    <p>Siswa langsung chat dengan AI Tutor berbasis kurikulum nasional. Guru memantau statistik & topik populer.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════ ARCHITECTURE ═══════ -->
+    <section class="architecture" id="architecture">
+        <div class="container">
+            <div class="section-header fade-up">
+                <span class="section-label">Arsitektur</span>
+                <h2>Local AI Server + Thin Clients</h2>
+                <p>1 server lokal melayani seluruh sekolah lewat browser</p>
+            </div>
+            <div class="arch-visual fade-up">
+                <div class="arch-server glass-card">
+                    <div class="server-icon">🖥️</div>
+                    <h3>AI Node (Server)</h3>
+                    <p style="font-size: var(--font-sm); color: var(--text-muted); margin-bottom: var(--space-md);">1 komputer sekolah</p>
+                    <ul class="arch-server-features">
+                        <li>Model GGUF (llama.cpp)</li>
+                        <li>ChromaDB (Vector DB)</li>
+                        <li>FastAPI Backend</li>
+                        <li>Data Kurikulum BSE</li>
+                    </ul>
+                </div>
+                <div class="arch-connector">
+                    <span>WiFi / LAN</span>
+                    <div class="line"></div>
+                    <span>Intranet</span>
+                </div>
+                <div class="arch-clients glass-card">
+                    <h3 style="margin-bottom: var(--space-md); font-size: var(--font-lg); font-weight: 700;">Thin Clients</h3>
+                    <div class="client-list">
+                        <div class="client-item">
+                            <span class="client-icon">💻</span>
+                            <span>Windows / Linux / Mac (Browser)</span>
+                        </div>
+                        <div class="client-item">
+                            <span class="client-icon">📱</span>
+                            <span>Smartphone via WiFi Lokal</span>
+                        </div>
+                        <div class="client-item">
+                            <span class="client-icon">📖</span>
+                            <span>Chromebook (Browser Only)</span>
+                        </div>
+                        <div class="client-item">
+                            <span class="client-icon">🖥️</span>
+                            <span>Komputer Lab (Windows Lama)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════ ROLES ═══════ -->
+    <section class="roles" id="roles">
+        <div class="container">
+            <div class="section-header fade-up">
+                <span class="section-label">Peran Pengguna</span>
+                <h2>Satu Platform, Tiga Peran</h2>
+                <p>Pilih peran Anda dan mulai gunakan AI Tutor</p>
+            </div>
+            <div class="roles-grid">
+                <!-- Student -->
+                <div class="role-card fade-up" data-role="siswa" onclick="showLoginForm('siswa')">
+                    <div class="role-icon">🎓</div>
+                    <h3>Siswa</h3>
+                    <p>Chat dengan AI Tutor untuk belajar & memahami materi kurikulum nasional</p>
+                    <ul class="role-features">
+                        <li>Chat berbasis kurikulum</li>
+                        <li>Ringkas materi & contoh soal</li>
+                        <li>Sumber halaman buku resmi</li>
+                        <li>Latihan soal otomatis</li>
+                    </ul>
+                    <button class="btn btn-primary" style="width:100%">Masuk sebagai Siswa</button>
+                </div>
+                <!-- Teacher -->
+                <div class="role-card fade-up" data-role="guru" onclick="showLoginForm('guru')">
+                    <div class="role-icon">👨‍🏫</div>
+                    <h3>Guru</h3>
+                    <p>Pantau aktivitas belajar siswa dan analisis topik yang sering ditanyakan</p>
+                    <ul class="role-features">
+                        <li>Statistik pertanyaan anonim</li>
+                        <li>Topik populer real-time</li>
+                        <li>Ekspor laporan PDF/CSV</li>
+                        <li>Insight kelas otomatis</li>
+                    </ul>
+                    <button class="btn btn-primary" style="width:100%">Masuk sebagai Guru</button>
+                </div>
+                <!-- Admin -->
+                <div class="role-card fade-up" data-role="admin" onclick="showLoginForm('admin')">
+                    <div class="role-icon">⚙️</div>
+                    <h3>Admin</h3>
+                    <p>Kelola sistem AI, update model & kurikulum, dan monitor server lokal</p>
+                    <ul class="role-features">
+                        <li>Update model AI</li>
+                        <li>Update data kurikulum</li>
+                        <li>Monitoring RAM & storage</li>
+                        <li>Backup database</li>
+                    </ul>
+                    <button class="btn btn-primary" style="width:100%">Masuk sebagai Admin</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════ IMPACT / SDG ═══════ -->
+    <section class="impact" id="impact">
+        <div class="container">
+            <div class="section-header fade-up">
+                <span class="section-label">Dampak Sosial</span>
+                <h2>Redistribusi Kecerdasan ke Edge</h2>
+                <p>Sejalan dengan SDG 4: Quality Education for All</p>
+            </div>
+            <div class="impact-grid">
+                <div class="impact-card fade-up">
+                    <div class="impact-icon">🏫</div>
+                    <h3>Tanpa Perangkat Baru</h3>
+                    <p>Tidak memaksa sekolah beli komputer baru. Support Windows lama & Chromebook.</p>
+                </div>
+                <div class="impact-card fade-up">
+                    <div class="impact-icon">📡</div>
+                    <h3>Tanpa Internet</h3>
+                    <p>100% offline setelah setup. Ideal untuk daerah 3T dan sekolah tanpa koneksi stabil.</p>
+                </div>
+                <div class="impact-card fade-up">
+                    <div class="impact-icon">🌏</div>
+                    <h3>Demokratisasi AI</h3>
+                    <p>AI bukan hanya milik kota besar. Setiap sekolah bisa punya AI Tutor sendiri.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════ FOOTER ═══════ -->
+    <footer class="landing-footer">
+        <p>© 2024 OpenClass Nexus AI — Offline AI Tutor untuk Pendidikan Indonesia</p>
+        <div class="footer-links">
+            <a href="#features">Fitur</a>
+            <a href="#how-it-works">Cara Kerja</a>
+            <a href="#roles">Mulai</a>
+        </div>
+    </footer>
+
+    <!-- ═══════ LOGIN MODAL ═══════ -->
+    <div id="login-modal" class="modal-overlay">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeLoginForm()">&times;</button>
+            <div class="modal-header">
+                <div class="modal-icon" id="modal-icon">🎓</div>
+                <h2 id="modal-title">Login Siswa</h2>
+            </div>
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <input type="hidden" id="role-input" name="role">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" class="form-input" placeholder="Masukkan username" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" class="form-input" placeholder="Masukkan password" required autocomplete="current-password">
+                </div>
+                <div class="form-group checkbox-group">
+                    <label>
+                        <input type="checkbox" id="remember-me" name="remember">
+                        Ingat saya
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg" id="submit-btn" style="width:100%">
+                    <span id="btn-text">Masuk</span>
+                    <span id="btn-loader" class="loader" style="display:none;">⟳</span>
+                </button>
+                <div id="error-message" class="error-message" style="display:none;"></div>
+            </form>
+            <div class="demo-credentials">
+                <p><strong>Demo Credentials:</strong></p>
+                <p>Siswa: <code>siswa / siswa123</code></p>
+                <p>Guru: <code>guru / guru123</code></p>
+                <p>Admin: <code>admin / admin123</code></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/landing.js"></script>
+</body>
+</html>

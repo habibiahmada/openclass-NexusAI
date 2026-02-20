@@ -1,53 +1,87 @@
-# OpenClass Nexus AI 🎓
+# 🎓 OpenClass Nexus AI
 
-[![License](https://img.shields.io/badge/License-Open%20Educational%20Resources-green)](docs/LEGAL_COMPLIANCE.md)
-[![Phase](https://img.shields.io/badge/Status-In%20Development-yellow)](docs/archive/reports/PHASE3_COMPLETION_SUMMARY.md)
+Sistem AI pembelajaran offline untuk sekolah Indonesia dengan RAG (Retrieval-Augmented Generation).
 
-**Offline AI Tutor for Indonesian Schools**
+## 🚀 Quick Start
 
-OpenClass Nexus AI is an offline-first AI tutoring system designed for schools with limited internet connectivity. It combines local AI inference (Llama 3.2 3B) with a Retrieval-Augmented Generation (RAG) pipeline using BSE Kemdikbud textbooks.
-
-## Key Features
-- **Zero Internet Required**: Runs completely offline after initial setup.
-- **Low Hardware Requirements**: Optimized for 4GB RAM laptops.
-- **Curriculum Aligned**: Answers based on official Indonesian textbooks.
-- **Privacy First**: No data leaves the local device during inference.
-
-## Documentation
-- **[User Guide](docs/USER_GUIDE.md)**: How to use the AI tutor.
-- **[Developer Guide](docs/DEVELOPER_GUIDE.md)**: Setup, installation, and contribution.
-- **[System Architecture](docs/SYSTEM_ARCHITECTURE.md)**: Technical design and components.
-- **[Legal Compliance](docs/LEGAL_COMPLIANCE.md)**: License and attribution details.
-
-## Quick Start
-
-### Prerequisites
-- Python 3.10+
-- 4GB+ RAM
-
-### Installation
 ```bash
-git clone https://github.com/habibiahmada/openclass-NexusAI.git
+# 1. Verifikasi sistem
+python scripts/check_system_ready.py
 
-cd openclass-nexus
-
-python -m venv openclass-env
-
-# Activate environment (Windows: openclass-env\Scripts\activate, Linux/Mac: source openclass-env/bin/activate)
-
-pip install -r requirements.txt
+# 2. Jalankan aplikasi
+python api_server.py
+# atau
+start_web_ui.bat  # Windows
+./start_web_ui.sh # Linux/Mac
 ```
 
-For detailed setup instructions, see the **[Developer Guide](docs/DEVELOPER_GUIDE.md)**.
+Akses di: http://localhost:8000
 
-## Contributing
-We welcome contributions! Please see the [Developer Guide](docs/DEVELOPER_GUIDE.md) for details on our workflow and code standards.
+## 📋 System Requirements
 
-## Developers
+- Python 3.8+
+- RAM 4GB minimum
+- Disk space 10GB
+- Windows/Linux/Mac OS
 
-OpenClass Nexus AI is developed by our team
-![contributors badge](https://readme-contribs.as93.net/contributors/habibiahmada/openclass-NexusAI)
+## 📚 Dokumentasi
 
+Lihat [docs/README.md](docs/README.md) untuk indeks lengkap dokumentasi.
 
-## License
-This project uses Open Educational Resources from BSE Kemdikbud. See [Legal Compliance](docs/LEGAL_COMPLIANCE.md) for details.
+### Panduan Cepat
+- [Quick Start](docs/guides/QUICK_START.md) - Mulai dalam 5 menit
+- [User Guide](docs/USER_GUIDE.md) - Panduan lengkap
+- [Deployment](docs/guides/DEPLOYMENT.md) - Deploy ke sekolah
+
+### Teknis
+- [System Architecture](docs/SYSTEM_ARCHITECTURE.md) - Arsitektur
+- [Developer Guide](docs/DEVELOPER_GUIDE.md) - Development
+- [Contributing](CONTRIBUTING.md) - Cara berkontribusi
+
+## 🎯 Fitur Utama
+
+- ✅ **Offline-first**: Berjalan tanpa internet
+- ✅ **Multi-role**: Siswa, Guru, Admin
+- ✅ **RAG-powered**: Jawaban berdasarkan materi kurikulum
+- ✅ **Low-spec friendly**: Berjalan di RAM 4GB
+- ✅ **LAN support**: Akses dari multiple komputer
+
+## 🏗️ Struktur Project
+
+```
+openclass-nexus-ai/
+├── api_server.py          # API server utama
+├── app.py                 # CLI interface (legacy)
+├── frontend/              # Web UI (HTML/CSS/JS)
+├── src/                   # Source code
+│   ├── local_inference/   # RAG pipeline & inference
+│   └── etl/              # Data processing
+├── scripts/              # Utility scripts (17 files)
+├── data/                 # Data & vector database
+├── models/               # LLM models
+├── docs/                 # Dokumentasi lengkap (24 files)
+└── config/               # Configuration files
+```
+
+Lihat [Project Structure](docs/PROJECT_STRUCTURE.md) untuk detail lengkap.
+
+## 🛠️ Development
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Run tests
+pytest
+
+# Check embeddings
+python scripts/check_embeddings.py
+```
+
+## 📄 License
+
+Lihat [LEGAL_COMPLIANCE.md](docs/LEGAL_COMPLIANCE.md) untuk informasi lisensi.
+
+## 🤝 Contributing
+
+Lihat [DEVELOPER_GUIDE.md](docs/DEVELOPER_GUIDE.md) untuk panduan kontribusi.

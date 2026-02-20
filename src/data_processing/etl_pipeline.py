@@ -348,7 +348,7 @@ class ETLPipeline:
             
             result.embeddings = embeddings
             result.total_embeddings = len(embeddings)
-            result.tokens_processed = self.bedrock_client.get_token_usage()
+            result.tokens_processed = self.bedrock_client.get_token_count()
             result.estimated_cost = self.bedrock_client.calculate_cost()
             
             logger.info(f"Generated {result.total_embeddings} embeddings")

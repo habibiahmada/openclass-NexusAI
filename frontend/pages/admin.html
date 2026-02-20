@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClass Nexus AI — Mode Admin</title>
+    <link rel="stylesheet" href="/static/css/variables.css">
+    <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="/static/css/components.css">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+</head>
+
+<body>
+    <!-- Offline Indicator -->
+    <div id="offline-indicator" class="offline-badge">
+        <span class="status-dot"></span>
+        Offline Aktif
+    </div>
+
+    <div class="dashboard-page">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="dashboard-logo">
+                <div class="logo-mark">N</div>
+                <h1>Nexus AI</h1>
+                <span class="role-badge">Admin</span>
+            </div>
+            <div class="dashboard-user">
+                <span class="user-name" id="user-name">Admin</span>
+                <button class="btn btn-danger btn-sm" onclick="handleLogout()">Keluar</button>
+            </div>
+        </header>
+
+        <!-- Dashboard Body -->
+        <div class="dashboard-body">
+            <h2 class="dashboard-title">Panel Admin</h2>
+            <p class="dashboard-subtitle">Kelola sistem AI, update konten, dan monitor server lokal</p>
+
+            <!-- System Status -->
+            <div class="dashboard-section">
+                <h3 class="section-title">
+                    <span class="icon">🔧</span>
+                    Status Sistem
+                </h3>
+                <div class="status-list">
+                    <div class="status-item">
+                        <span class="status-label">Model AI</span>
+                        <span class="status-value" id="model-status">Memuat...</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Database Vektor</span>
+                        <span class="status-value" id="db-status">Memuat...</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Versi Sistem</span>
+                        <span class="status-value" id="system-version">1.0.0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Management -->
+            <div class="dashboard-section">
+                <h3 class="section-title">
+                    <span class="icon">📦</span>
+                    Update Konten
+                </h3>
+                <div class="action-grid">
+                    <button class="btn btn-primary" onclick="updateModel()">🔄 Update Model AI</button>
+                    <button class="btn btn-primary" onclick="updateCurriculum()">📚 Update Kurikulum</button>
+                    <button class="btn btn-secondary" onclick="createBackup()">🗄️ Backup Database</button>
+                </div>
+            </div>
+
+            <!-- Monitoring -->
+            <div class="dashboard-section">
+                <h3 class="section-title">
+                    <span class="icon">📈</span>
+                    Monitoring
+                </h3>
+                <div class="monitor-grid">
+                    <div class="monitor-card">
+                        <p class="monitor-label">Penggunaan RAM</p>
+                        <p class="monitor-value" id="ram-usage">Memuat...</p>
+                    </div>
+                    <div class="monitor-card">
+                        <p class="monitor-label">Storage</p>
+                        <p class="monitor-value" id="storage-usage">Memuat...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/common.js"></script>
+    <script src="/static/js/admin.js"></script>
+</body>
+
+</html>

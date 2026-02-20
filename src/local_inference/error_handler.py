@@ -28,6 +28,7 @@ class ErrorCategory(Enum):
     STORAGE_ERROR = "storage_error"
     VALIDATION_ERROR = "validation_error"
     CONFIGURATION_ERROR = "configuration_error"
+    VECTOR_DB_ERROR = "vector_db_error"
     UNKNOWN_ERROR = "unknown_error"
 
 
@@ -533,6 +534,85 @@ class InferenceErrorHandler:
         )
 
 
+
+class VectorDBErrorHandler:
+    """Handles vector database errors with recovery mechanisms."""
+    
+    def handle_vectordb_error(
+        self, 
+        error: Exception, 
+        context: ErrorContext
+    ) -> ErrorRecoveryResult:
+        """
+        Handle vector database errors.
+        
+        Args:
+            error: The exception that occurred
+            context: Error context information
+            
+        Returns:
+            ErrorRecoveryResult with recovery information
+        """
+        logger.error(f"Vector DB error in {context.operation}: {error}")
+        
+        # Check specific ChromaDB errors
+        error_str = str(error).lower()
+        
+        if "collection not found" in error_str or "no such collection" in error_str:
+            return ErrorRecoveryResult(
+                success=False,
+                message="Koleksi database tidak ditemukan. Mencoba inisialisasi ulang.",
+                recovery_action="reinitialize_collection",
+                retry_recommended=True,
+                additional_info={
+                    "reinitialization_needed": True,
+                    "suggested_actions": ["Jalankan inisialisasi database", "Periksa nama koleksi"]
+                }
+            )
+        elif "connection" in error_str or "refused" in error_str:
+            return ErrorRecoveryResult(
+                success=False,
+                message="Gagal terhubung ke database vector. Periksa status database.",
+                recovery_action="check_db_connection",
+                retry_recommended=True,
+                additional_info={
+                    "connection_issue": True,
+                    "suggested_actions": ["Restart layanan database", "Periksa konfigurasi port"]
+                }
+            )
+        elif "locked" in error_str or "busy" in error_str:
+             return ErrorRecoveryResult(
+                success=False,
+                message="Database sedang sibuk atau terkunci. Mencoba lagi dalam beberapa saat.",
+                recovery_action="retry_with_backoff",
+                retry_recommended=True,
+                additional_info={
+                    "db_locked": True,
+                    "delay_seconds": 2
+                }
+            )
+        elif "dimension mismatch" in error_str:
+             return ErrorRecoveryResult(
+                success=False,
+                message="Dimensi embedding tidak sesuai. Periksa konfigurasi model embedding.",
+                recovery_action="check_embedding_config",
+                user_action_required=True,
+                additional_info={
+                    "dimension_mismatch": True,
+                    "suggested_actions": ["Pastikan model embedding konsisten", "Reset database jika model berubah"]
+                }
+            )
+        else:
+             return ErrorRecoveryResult(
+                success=False,
+                message=f"Terjadi kesalahan pada database: {str(error)}",
+                recovery_action="generic_db_error",
+                retry_recommended=False,
+                fallback_available=True,
+                additional_info={"error_details": str(error)}
+            )
+
+
 class ComprehensiveErrorHandler:
     """
     Comprehensive error handler combining all error handling capabilities.
@@ -546,6 +626,7 @@ class ComprehensiveErrorHandler:
         self.network_handler = NetworkErrorHandler()
         self.model_handler = ModelLoadingErrorHandler()
         self.inference_handler = InferenceErrorHandler()
+        self.vectordb_handler = VectorDBErrorHandler()
         
         # Error statistics
         self.error_counts = {category.value: 0 for category in ErrorCategory}
@@ -593,6 +674,8 @@ class ComprehensiveErrorHandler:
                 result = self._handle_validation_error(error, context)
             elif category == ErrorCategory.CONFIGURATION_ERROR:
                 result = self._handle_configuration_error(error, context)
+            elif category == ErrorCategory.VECTOR_DB_ERROR:
+                result = self.vectordb_handler.handle_vectordb_error(error, context)
             else:
                 result = self._handle_unknown_error(error, context)
             
@@ -808,3 +891,29 @@ def handle_inference_error(
     )
     
     return handler.handle_error(error, ErrorCategory.INFERENCE_ERROR, context)
+
+
+def handle_vectordb_error(
+    error: Exception,
+    operation: str,
+    details: Optional[Dict[str, Any]] = None
+) -> ErrorRecoveryResult:
+    """
+    Convenience function for handling vector database errors.
+    
+    Args:
+        error: The vector db error
+        operation: Description of the operation that failed
+        details: Additional details (optional)
+        
+    Returns:
+        ErrorRecoveryResult with recovery information
+    """
+    handler = ComprehensiveErrorHandler()
+    context = ErrorContext(
+        operation=operation,
+        component="vector_db",
+        additional_info=details
+    )
+    
+    return handler.handle_error(error, ErrorCategory.VECTOR_DB_ERROR, context)

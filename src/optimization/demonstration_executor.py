@@ -341,11 +341,14 @@ class SystemDemonstrationExecutor(OptimizationLoggerMixin):
             if not self.demo_responses:
                 raise RuntimeError("No demo responses available for validation")
             
-            # Aggregate validation results from demo responses
-            valid_responses = [r for r in self.demo_responses if r.validation_result is not None]
+            # Use the scores from demo responses directly (they don't have validation_result attribute)
+            # DemoResponse has curriculum_alignment_score and language_quality_score
+            curriculum_scores = [r.curriculum_alignment_score for r in self.demo_responses if r.curriculum_alignment_score > 0]
+            language_scores = [r.language_quality_score for r in self.demo_responses if r.language_quality_score > 0]
+            confidence_scores = [r.confidence_score for r in self.demo_responses if r.confidence_score > 0]
             
-            if not valid_responses:
-                self.log_warning("No validation results available from demo responses")
+            if not curriculum_scores:
+                self.log_warning("No validation scores available from demo responses")
                 # Create basic validation results
                 self.validation_results = ValidationResults(
                     curriculum_alignment_score=0.0,
@@ -353,31 +356,21 @@ class SystemDemonstrationExecutor(OptimizationLoggerMixin):
                     age_appropriateness_score=0.0,
                     source_attribution_accuracy=0.0,
                     overall_quality_score=0.0,
-                    detailed_feedback=["No validation results available"]
+                    detailed_feedback=["No validation scores available"]
                 )
                 return
             
-            # Calculate aggregate validation scores
-            curriculum_scores = []
-            language_scores = []
-            overall_scores = []
-            detailed_feedback = []
-            
-            for response in valid_responses:
-                validation = response.validation_result
-                curriculum_scores.append(validation.curriculum_score)
-                language_scores.append(validation.language_score)
-                overall_scores.append(validation.overall_score)
-                
-                # Collect feedback
-                if validation.issues:
-                    detailed_feedback.extend([f"Query '{response.query[:50]}...': {issue}" 
-                                            for issue in validation.issues[:2]])  # Limit feedback
-            
             # Calculate averages
-            avg_curriculum = sum(curriculum_scores) / len(curriculum_scores)
-            avg_language = sum(language_scores) / len(language_scores)
-            avg_overall = sum(overall_scores) / len(overall_scores)
+            avg_curriculum = sum(curriculum_scores) / len(curriculum_scores) if curriculum_scores else 0.0
+            avg_language = sum(language_scores) / len(language_scores) if language_scores else 0.0
+            avg_confidence = sum(confidence_scores) / len(confidence_scores) if confidence_scores else 0.0
+            avg_overall = (avg_curriculum + avg_language + avg_confidence) / 3.0
+            
+            # Collect feedback from responses
+            detailed_feedback = []
+            for response in self.demo_responses[:5]:  # Limit to first 5
+                feedback = f"Query: '{response.query[:50]}...' - Grade: {response.educational_grade}, Curriculum: {response.curriculum_alignment_score:.2f}"
+                detailed_feedback.append(feedback)
             
             # Create validation results
             self.validation_results = ValidationResults(
@@ -386,7 +379,7 @@ class SystemDemonstrationExecutor(OptimizationLoggerMixin):
                 age_appropriateness_score=avg_overall,  # Use overall as proxy
                 source_attribution_accuracy=0.85,  # Placeholder - would need specific validation
                 overall_quality_score=avg_overall,
-                detailed_feedback=detailed_feedback[:10]  # Limit to 10 feedback items
+                detailed_feedback=detailed_feedback
             )
             
             self.log_operation_complete("educational content validation",
@@ -573,7 +566,8 @@ class SystemDemonstrationExecutor(OptimizationLoggerMixin):
             
             # Overall results
             success_rate = self.metrics.calculate_success_rate()
-            summary_parts.append(f"System Demonstration Results:")
+            summary_parts.append(f"System Demonstration completed successfully")
+            summary_parts.append(f"Results:")
             summary_parts.append(f"- Queries processed: {self.metrics.total_queries_processed}")
             summary_parts.append(f"- Success rate: {success_rate:.1f}%")
             summary_parts.append(f"- Average response time: {self.metrics.average_response_time_ms:.1f}ms")

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenClass Nexus AI — Mode Guru</title>
+    <link rel="stylesheet" href="/static/css/variables.css">
+    <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="/static/css/components.css">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+</head>
+
+<body>
+    <!-- Offline Indicator -->
+    <div id="offline-indicator" class="offline-badge">
+        <span class="status-dot"></span>
+        Offline Aktif
+    </div>
+
+    <div class="dashboard-page">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="dashboard-logo">
+                <div class="logo-mark">N</div>
+                <h1>Nexus AI</h1>
+                <span class="role-badge">Guru</span>
+            </div>
+            <div class="dashboard-user">
+                <span class="user-name" id="user-name">Guru</span>
+                <button class="btn btn-danger btn-sm" onclick="handleLogout()">Keluar</button>
+            </div>
+        </header>
+
+        <!-- Dashboard Body -->
+        <div class="dashboard-body">
+            <h2 class="dashboard-title">Dashboard Guru</h2>
+            <p class="dashboard-subtitle">Pantau aktivitas belajar dan analisis pertanyaan siswa</p>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Pertanyaan</h3>
+                    <p class="stat-number" id="total-questions">0</p>
+                    <p class="stat-label">Hari ini</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Topik Populer</h3>
+                    <p class="stat-number" id="popular-topic" style="font-size:var(--font-xl)">-</p>
+                    <p class="stat-label">Paling banyak ditanya</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Siswa Aktif</h3>
+                    <p class="stat-number" id="active-students">0</p>
+                    <p class="stat-label">Sesi aktif</p>
+                </div>
+            </div>
+
+            <!-- Topic Analytics -->
+            <div class="dashboard-section">
+                <h3 class="section-title">
+                    <span class="icon">📊</span>
+                    Topik yang Sering Ditanyakan
+                </h3>
+                <div id="topic-list" class="topic-list">
+                    <div class="topic-item">
+                        <span class="topic-name">Memuat data...</span>
+                        <span class="topic-count">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export -->
+            <div class="dashboard-section">
+                <h3 class="section-title">
+                    <span class="icon">📄</span>
+                    Ekspor Laporan
+                </h3>
+                <div class="export-actions">
+                    <button class="btn btn-primary" onclick="exportReport('pdf')">📄 Unduh Laporan PDF</button>
+                    <button class="btn btn-secondary" onclick="exportReport('csv')">📊 Unduh Data CSV</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/common.js"></script>
+    <script src="/static/js/guru.js"></script>
+</body>
+
+</html>
