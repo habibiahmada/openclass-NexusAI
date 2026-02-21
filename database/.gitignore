@@ -1,0 +1,23 @@
+# Database backups
+*.sql.gz
+*.sql.bak
+backup_*.sql
+
+# Database dumps
+dump_*.sql
+
+# Local database files (if using SQLite for testing)
+*.db
+*.sqlite
+*.sqlite3
+
+# PostgreSQL data directory (if running locally)
+pgdata/
+postgres_data/
+
+# Connection configuration (sensitive)
+.pgpass
+.psqlrc
+
+# Migration logs
+migration_*.log

@@ -16,6 +16,11 @@ import json
 from pathlib import Path
 import secrets
 import hashlib
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Configure logging
 logging.basicConfig(
@@ -34,6 +39,22 @@ except ImportError as e:
     CompletePipeline = None
     PipelineConfig = None
     RAG_AVAILABLE = False
+
+# Import database components
+try:
+    from src.persistence.database_manager import DatabaseManager
+    from src.persistence.session_repository import SessionRepository
+    from src.persistence.chat_history_repository import ChatHistoryRepository
+    from src.persistence.user_repository import UserRepository
+    DB_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"Database components not available: {e}")
+    logger.warning("Server will run without database persistence")
+    DatabaseManager = None
+    SessionRepository = None
+    ChatHistoryRepository = None
+    UserRepository = None
+    DB_AVAILABLE = False
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -127,9 +148,8 @@ DEMO_USERS = {
     }
 }
 
-# Token storage (in-memory for offline-first)
-# In production, use Redis or database
-active_tokens = {}
+# Token storage - now using database instead of in-memory
+# active_tokens = {}  # REMOVED: Replaced with SessionRepository
 
 def generate_token() -> str:
     """Generate secure random token"""
@@ -143,17 +163,48 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)) 
     """Verify JWT token and return user info"""
     token = credentials.credentials
     
-    if token not in active_tokens:
-        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    # Check if database is available
+    if not DB_AVAILABLE or not state.session_repo:
+        # Fallback to demo mode without persistence
+        logger.error("Database unavailable during token verification")
+        raise HTTPException(
+            status_code=503, 
+            detail="Database temporarily unavailable. Please try again later."
+        )
     
-    token_data = active_tokens[token]
+    try:
+        # Get session from database
+        session = state.session_repo.get_session_by_token(token)
+        
+        if not session:
+            raise HTTPException(status_code=401, detail="Invalid or expired token")
+        
+        # Get user info from database
+        user = state.user_repo.get_user_by_id(session.user_id)
+        
+        if not user:
+            raise HTTPException(status_code=401, detail="User not found")
+        
+        # Return token data in expected format
+        return {
+            'username': user.username,
+            'role': user.role,
+            'name': user.full_name,
+            'user_id': user.id,
+            'created': session.created_at,
+            'expires': session.expires_at
+        }
     
-    # Check if token expired (24 hours)
-    if datetime.now() > token_data['expires']:
-        del active_tokens[token]
-        raise HTTPException(status_code=401, detail="Token expired")
-    
-    return token_data
+    except HTTPException:
+        # Re-raise HTTP exceptions (401, 403, etc.)
+        raise
+    except Exception as e:
+        # Log database errors with stack trace
+        logger.error(f"Database error during token verification: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=503,
+            detail="Database temporarily unavailable. Please try again later."
+        )
 
 def require_role(allowed_roles: List[str]):
     """Dependency to check if user has required role"""
@@ -172,11 +223,63 @@ def require_role(allowed_roles: List[str]):
 class AppState:
     def __init__(self):
         self.pipeline = None
-        self.chat_logs = []
+        # Chat logs now stored in database instead of in-memory
+        # self.chat_logs = []  # REMOVED: Replaced with ChatHistoryRepository
         self.is_initialized = False
+        
+        # Database components
+        self.db_manager = None
+        self.session_repo = None
+        self.chat_history_repo = None
+        self.user_repo = None
+        self.db_initialized = False
+    
+    def initialize_database(self):
+        """Initialize database connection and repositories"""
+        if not DB_AVAILABLE:
+            logger.warning("Database components not available - skipping database initialization")
+            return False
+        
+        try:
+            # Get database URL from environment
+            database_url = os.getenv('DATABASE_URL')
+            
+            if not database_url:
+                logger.warning("DATABASE_URL not set - database features disabled")
+                return False
+            
+            logger.info("Initializing database connection...")
+            
+            # Create database manager
+            self.db_manager = DatabaseManager(database_url)
+            
+            # Test connection
+            if not self.db_manager.health_check():
+                logger.error("Database health check failed - PostgreSQL may be unavailable")
+                logger.error("Please ensure PostgreSQL is running and DATABASE_URL is correct")
+                return False
+            
+            # Initialize repositories
+            self.session_repo = SessionRepository(self.db_manager)
+            self.chat_history_repo = ChatHistoryRepository(self.db_manager)
+            self.user_repo = UserRepository(self.db_manager)
+            
+            self.db_initialized = True
+            logger.info("Database initialized successfully")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to initialize database: {e}", exc_info=True)
+            logger.error("Server will run without database persistence")
+            logger.error("To enable database features, ensure PostgreSQL is running and DATABASE_URL is set")
+            self.db_initialized = False
+            return False
     
     def initialize(self):
         """Initialize complete pipeline"""
+        # Initialize database first
+        self.initialize_database()
+        
         if not RAG_AVAILABLE:
             logger.warning("RAG components not available - running in demo mode")
             self.is_initialized = False
@@ -230,11 +333,6 @@ async def startup_event():
     except Exception as e:
         logger.error(f"Startup initialization failed: {e}")
         logger.info("Server starting in demo mode")
-        logger.info("Server starting in demo mode")
-    try:
-        state.initialize()
-    except Exception as e:
-        logger.error(f"Startup failed: {e}")
 
 # ===========================
 # Root & Health Endpoints
@@ -250,6 +348,7 @@ async def health_check():
     return {
         "status": "healthy",
         "initialized": state.is_initialized,
+        "database": state.db_initialized,
         "timestamp": datetime.now().isoformat()
     }
 
@@ -259,61 +358,95 @@ async def health_check():
 @app.post("/api/auth/login", response_model=LoginResponse)
 async def login(request: LoginRequest):
     """
-    Login endpoint - offline-first authentication
+    Login endpoint - offline-first authentication with database persistence
     """
     username = request.username.lower()
     password = request.password
     role = request.role.lower()
     
-    # Verify user exists
-    if username not in DEMO_USERS:
-        return LoginResponse(
-            success=False,
-            token="",
-            message="Username tidak ditemukan",
-            role=""
+    # Check if database is available
+    if not state.db_initialized:
+        logger.error("Login attempt failed - database unavailable")
+        raise HTTPException(
+            status_code=503,
+            detail="Database temporarily unavailable. Authentication is disabled. Please try again later."
         )
     
-    user = DEMO_USERS[username]
-    
-    # Verify password
-    if hash_password(password) != user['password']:
+    try:
+        # Verify user exists (using demo users for now, will migrate to database later)
+        if username not in DEMO_USERS:
+            return LoginResponse(
+                success=False,
+                token="",
+                message="Username tidak ditemukan",
+                role=""
+            )
+        
+        user = DEMO_USERS[username]
+        
+        # Verify password
+        if hash_password(password) != user['password']:
+            return LoginResponse(
+                success=False,
+                token="",
+                message="Password salah",
+                role=""
+            )
+        
+        # Verify role matches
+        if user['role'] != role:
+            return LoginResponse(
+                success=False,
+                token="",
+                message=f"Role tidak sesuai. User ini adalah {user['role']}",
+                role=""
+            )
+        
+        # Generate token
+        token = generate_token()
+        
+        # Get or create user in database
+        db_user = state.user_repo.get_user_by_username(username)
+        if not db_user:
+            # Create user in database if not exists
+            # Use the plain password from the demo users (we know the plain passwords)
+            plain_passwords = {
+                "siswa": "siswa123",
+                "guru": "guru123",
+                "admin": "admin123"
+            }
+            db_user = state.user_repo.create_user(
+                username=username,
+                password=plain_passwords.get(username, "default123"),
+                role=role,
+                full_name=user['name']
+            )
+        
+        # Store token in database (expires in 24 hours)
+        session = state.session_repo.create_session(
+            user_id=db_user.id,
+            token=token,
+            expires_hours=24
+        )
+        
+        logger.info(f"User logged in: {username} ({role})")
+        
         return LoginResponse(
-            success=False,
-            token="",
-            message="Password salah",
-            role=""
+            success=True,
+            token=token,
+            message="Login berhasil",
+            role=role
         )
     
-    # Verify role matches
-    if user['role'] != role:
-        return LoginResponse(
-            success=False,
-            token="",
-            message=f"Role tidak sesuai. User ini adalah {user['role']}",
-            role=""
+    except HTTPException:
+        # Re-raise HTTP exceptions
+        raise
+    except Exception as e:
+        logger.error(f"Login failed due to database error: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=503,
+            detail="Database temporarily unavailable. Please try again later."
         )
-    
-    # Generate token
-    token = generate_token()
-    
-    # Store token (expires in 24 hours)
-    active_tokens[token] = {
-        'username': username,
-        'role': role,
-        'name': user['name'],
-        'created': datetime.now(),
-        'expires': datetime.now() + timedelta(hours=24)
-    }
-    
-    logger.info(f"User logged in: {username} ({role})")
-    
-    return LoginResponse(
-        success=True,
-        token=token,
-        message="Login berhasil",
-        role=role
-    )
 
 @app.post("/api/auth/verify", response_model=TokenVerifyResponse)
 async def verify_token_endpoint(token_data: Dict = Depends(verify_token)):
@@ -329,16 +462,31 @@ async def verify_token_endpoint(token_data: Dict = Depends(verify_token)):
 @app.post("/api/auth/logout")
 async def logout(token_data: Dict = Depends(verify_token)):
     """
-    Logout endpoint - invalidate token
+    Logout endpoint - invalidate token in database
     """
-    # Find and remove token
-    for token, data in list(active_tokens.items()):
-        if data['username'] == token_data['username']:
-            del active_tokens[token]
+    if not state.db_initialized:
+        logger.error("Logout attempt failed - database unavailable")
+        raise HTTPException(
+            status_code=503,
+            detail="Database temporarily unavailable. Please try again later."
+        )
     
-    logger.info(f"User logged out: {token_data['username']}")
+    try:
+        # Get the token from the request
+        # We need to extract it from the authorization header
+        # For now, delete all sessions for this user
+        deleted_count = state.session_repo.delete_user_sessions(token_data['user_id'])
+        
+        logger.info(f"User logged out: {token_data['username']} ({deleted_count} sessions deleted)")
+        
+        return {"success": True, "message": "Logout berhasil"}
     
-    return {"success": True, "message": "Logout berhasil"}
+    except Exception as e:
+        logger.error(f"Logout failed due to database error: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=503,
+            detail="Database temporarily unavailable. Please try again later."
+        )
 
 # ===========================
 # Role-Specific Pages
@@ -362,9 +510,9 @@ async def admin_page():
 # Chat Endpoints (Student Mode)
 # ===========================
 @app.post("/api/chat", response_model=ChatResponse)
-async def chat(request: ChatRequest):
+async def chat(request: ChatRequest, token_data: Dict = Depends(verify_token)):
     """
-    Main chat endpoint untuk student mode
+    Main chat endpoint untuk student mode with database persistence
     """
     if not state.is_initialized:
         # Demo mode response with helpful instructions
@@ -387,7 +535,7 @@ async def chat(request: ChatRequest):
         )
     
     try:
-        logger.info(f"Received question: {request.message[:50]}...")
+        logger.info(f"Received question from user {token_data['username']}: {request.message[:50]}...")
         
         # Process with complete pipeline
         result = state.pipeline.process_query(
@@ -395,14 +543,26 @@ async def chat(request: ChatRequest):
             subject_filter=request.subject_filter if request.subject_filter != "all" else None
         )
         
-        # Log the interaction
-        log_entry = {
-            "timestamp": datetime.now().isoformat(),
-            "question": request.message,
-            "subject": request.subject_filter,
-            "response_length": len(result.response)
-        }
-        state.chat_logs.append(log_entry)
+        # Save to database if available
+        if state.db_initialized and state.chat_history_repo:
+            try:
+                # Get subject_id if subject filter is specified
+                subject_id = None  # TODO: Map subject_filter to subject_id from database
+                
+                state.chat_history_repo.save_chat(
+                    user_id=token_data['user_id'],
+                    subject_id=subject_id,
+                    question=request.message,
+                    response=result.response,
+                    confidence=result.confidence
+                )
+                logger.info(f"Chat saved to database for user_id={token_data['user_id']}")
+            except Exception as e:
+                logger.error(f"Failed to save chat to database: {e}", exc_info=True)
+                logger.warning("Continuing without saving chat history")
+                # Continue even if database save fails - don't block user interaction
+        else:
+            logger.warning("Database not available - chat history not saved")
         
         # Extract source information
         source = None
@@ -416,62 +576,101 @@ async def chat(request: ChatRequest):
         )
         
     except Exception as e:
-        logger.error(f"Error processing chat: {e}")
+        logger.error(f"Error processing chat: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 # ===========================
 # Teacher Dashboard Endpoints
 # ===========================
 @app.get("/api/teacher/stats", response_model=TeacherStats)
-async def get_teacher_stats():
+async def get_teacher_stats(token_data: Dict = Depends(verify_token)):
     """
-    Get statistics for teacher dashboard
+    Get statistics for teacher dashboard from database
     """
     try:
-        # Analyze chat logs
-        total_questions = len(state.chat_logs)
+        if not state.db_initialized or not state.chat_history_repo:
+            # Graceful degradation - return empty stats with user-friendly message
+            logger.warning("Teacher stats requested but database unavailable")
+            raise HTTPException(
+                status_code=503,
+                detail="Database temporarily unavailable. Statistics cannot be retrieved. Please try again later."
+            )
         
-        # Count topics (simplified)
+        # Get recent chat history (last 1000 records)
+        recent_chats = state.chat_history_repo.get_recent_chats(limit=1000)
+        
+        total_questions = len(recent_chats)
+        
+        # Count topics by subject_id
         topic_counts = {}
-        for log in state.chat_logs:
-            subject = log.get("subject", "unknown")
-            topic_counts[subject] = topic_counts.get(subject, 0) + 1
+        unique_users = set()
+        
+        for chat in recent_chats:
+            # Track unique users
+            unique_users.add(chat.user_id)
+            
+            # Count by subject (use subject_id or "unknown")
+            subject_key = f"Subject {chat.subject_id}" if chat.subject_id else "Umum"
+            topic_counts[subject_key] = topic_counts.get(subject_key, 0) + 1
         
         # Get most popular topic
         popular_topic = max(topic_counts.items(), key=lambda x: x[1])[0] if topic_counts else "Belum ada data"
         
         # Format topics list
         topics = [
-            {"name": subject.capitalize(), "count": count}
+            {"name": subject, "count": count}
             for subject, count in sorted(topic_counts.items(), key=lambda x: x[1], reverse=True)
         ]
         
         return TeacherStats(
             total_questions=total_questions,
-            popular_topic=popular_topic.capitalize(),
-            active_students=1,  # Simplified for local mode
+            popular_topic=popular_topic,
+            active_students=len(unique_users),
             topics=topics[:10]  # Top 10
         )
         
+    except HTTPException:
+        # Re-raise HTTP exceptions
+        raise
     except Exception as e:
-        logger.error(f"Error getting teacher stats: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Error getting teacher stats: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=503,
+            detail="Database temporarily unavailable. Please try again later."
+        )
 
 @app.get("/api/teacher/export")
-async def export_report(format: str = "pdf"):
+async def export_report(format: str = "pdf", token_data: Dict = Depends(verify_token)):
     """
-    Export teacher report in PDF or CSV format
+    Export teacher report in PDF or CSV format from database
     """
     try:
+        if not state.db_initialized or not state.chat_history_repo:
+            logger.warning("Export report requested but database unavailable")
+            raise HTTPException(
+                status_code=503,
+                detail="Database temporarily unavailable. Report export is not available. Please try again later."
+            )
+        
+        # Get recent chat history
+        recent_chats = state.chat_history_repo.get_recent_chats(limit=1000)
+        
         if format == "csv":
             # Generate CSV
             import csv
             from io import StringIO
             
             output = StringIO()
-            writer = csv.DictWriter(output, fieldnames=["timestamp", "question", "subject"])
+            writer = csv.DictWriter(output, fieldnames=["timestamp", "user_id", "question", "subject_id"])
             writer.writeheader()
-            writer.writerows(state.chat_logs)
+            
+            for chat in recent_chats:
+                writer.writerow({
+                    "timestamp": chat.created_at.isoformat() if chat.created_at else "",
+                    "user_id": chat.user_id,
+                    "question": chat.question,
+                    "subject_id": chat.subject_id or "N/A"
+                })
             
             return StreamingResponse(
                 iter([output.getvalue()]),
@@ -480,11 +679,18 @@ async def export_report(format: str = "pdf"):
             )
         else:
             # For PDF, return JSON for now (can be enhanced with reportlab)
-            return {"message": "PDF export coming soon", "data": state.chat_logs}
+            chat_data = [chat.to_dict() for chat in recent_chats]
+            return {"message": "PDF export coming soon", "data": chat_data}
             
+    except HTTPException:
+        # Re-raise HTTP exceptions
+        raise
     except Exception as e:
-        logger.error(f"Error exporting report: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Error exporting report: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=503,
+            detail="Database temporarily unavailable. Please try again later."
+        )
 
 # ===========================
 # Admin Panel Endpoints
@@ -535,9 +741,9 @@ async def update_curriculum():
     return {"message": "Fitur update kurikulum akan segera tersedia"}
 
 @app.post("/api/admin/backup")
-async def create_backup():
+async def create_backup(token_data: Dict = Depends(verify_token)):
     """
-    Create system backup
+    Create system backup (database data)
     """
     try:
         backup_dir = Path("backups")
@@ -547,9 +753,17 @@ async def create_backup():
         
         backup_data = {
             "timestamp": datetime.now().isoformat(),
-            "chat_logs": state.chat_logs,
+            "database_available": state.db_initialized,
             "config": "placeholder"
         }
+        
+        # Add database stats if available
+        if state.db_initialized and state.chat_history_repo:
+            try:
+                recent_chats = state.chat_history_repo.get_recent_chats(limit=100)
+                backup_data["recent_chats_count"] = len(recent_chats)
+            except Exception as e:
+                logger.error(f"Failed to get chat stats for backup: {e}")
         
         with open(backup_file, 'w', encoding='utf-8') as f:
             json.dump(backup_data, f, ensure_ascii=False, indent=2)

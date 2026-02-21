@@ -70,76 +70,76 @@ Python 3.9+ (as specified in the design document)
     - Verify 100% of tests pass
     - _Requirements: 2.5, 13.2_
 
-  - [-] 1.7 Checkpoint - Commit Phase 1
+  - [x] 1.7 Checkpoint - Commit Phase 1
     - Commit changes with message "Phase 1: Folder structure alignment"
     - Tag commit as `refactoring-phase-1`
     - Ensure all tests pass, ask the user if questions arise.
 
 
-- [ ] 2. Phase 2: Database Persistence Layer
-  - [ ] 2.1 Create PostgreSQL database schema
+- [x] 2. Phase 2: Database Persistence Layer
+  - [x] 2.1 Create PostgreSQL database schema
     - Write SQL schema for all tables (users, sessions, chat_history, subjects, books, topic_mastery, weak_areas, practice_questions)
     - Create indexes for performance optimization
     - Add foreign key constraints and check constraints
     - _Requirements: 3.1_
 
-  - [ ] 2.2 Implement DatabaseManager class
+  - [x] 2.2 Implement DatabaseManager class
     - Create connection pooling (pool_size=10, max_overflow=20)
     - Implement get_connection(), execute_query(), execute_transaction()
     - Add health_check() method
     - _Requirements: 3.1, 3.4, 3.5_
 
-  - [ ] 2.3 Implement UserRepository
+  - [x] 2.3 Implement UserRepository
     - Create CRUD operations for users
     - Implement password hashing with SHA256
     - Add user validation logic
     - _Requirements: 3.1_
 
-  - [ ] 2.4 Implement SessionRepository
+  - [x] 2.4 Implement SessionRepository
     - Create session management operations
     - Implement session expiration (24 hours)
     - Add cleanup_expired_sessions() method
     - _Requirements: 3.1_
 
-  - [ ] 2.5 Implement ChatHistoryRepository
+  - [x] 2.5 Implement ChatHistoryRepository
     - Create chat persistence operations
     - Implement get_user_history() and get_subject_history()
     - Add pagination support
     - _Requirements: 3.1, 3.2_
 
-  - [ ] 2.6 Implement SubjectRepository and BookRepository
+  - [x] 2.6 Implement SubjectRepository and BookRepository
     - Create dynamic subject management
     - Implement VKP version tracking in books table
     - Add subject-book relationship management
     - _Requirements: 3.1_
 
-  - [ ] 2.7 Replace in-memory storage with database operations
+  - [x] 2.7 Replace in-memory storage with database operations
     - Replace active_tokens dict with SessionRepository
     - Replace state.chat_logs list with ChatHistoryRepository
     - Update API endpoints to use repositories
     - _Requirements: 3.2_
 
-  - [ ] 2.8 Write property test for data persistence across restarts
+  - [x] 2.8 Write property test for data persistence across restarts
     - **Property 3: Data Persistence Across Restarts**
     - **Validates: Requirements 3.3**
 
-  - [ ] 2.9 Write property test for database transaction atomicity
+  - [x] 2.9 Write property test for database transaction atomicity
     - **Property 4: Database Transaction Atomicity**
     - **Validates: Requirements 3.4**
 
-  - [ ] 2.10 Write unit tests for repository operations
+  - [x] 2.10 Write unit tests for repository operations
     - Test CRUD operations for each repository
     - Test error handling (connection failures, constraint violations)
     - Test edge cases (empty results, duplicate keys)
     - _Requirements: 3.1-3.6_
 
-  - [ ] 2.11 Implement graceful degradation for database unavailability
+  - [x] 2.11 Implement graceful degradation for database unavailability
     - Add error handling for PostgreSQL connection failures
     - Return HTTP 503 with user-friendly message
     - Log errors with stack traces
     - _Requirements: 3.6_
 
-  - [ ] 2.12 Checkpoint - Verify data persists across server restarts
+  - [x] 2.12 Checkpoint - Verify data persists across server restarts
     - Start server, create test data
     - Restart server
     - Verify data is still present
