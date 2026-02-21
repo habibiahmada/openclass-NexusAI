@@ -8,7 +8,7 @@ import pytest
 from hypothesis import given, strategies as st, settings
 from unittest.mock import Mock, patch, MagicMock
 from src.ui.pipeline_manager import PipelineManager
-from src.local_inference.complete_pipeline import CompletePipeline
+from src.edge_runtime.complete_pipeline import CompletePipeline
 
 
 class TestLazyInitializationProperty:

@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 # Import existing components (with error handling)
 try:
-    from src.local_inference.complete_pipeline import CompletePipeline, PipelineConfig
+    from src.edge_runtime.complete_pipeline import CompletePipeline, PipelineConfig
     RAG_AVAILABLE = True
 except ImportError as e:
     logger.warning(f"RAG components not available: {e}")

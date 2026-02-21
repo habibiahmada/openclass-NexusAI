@@ -547,7 +547,7 @@ CORS_ORIGINS=http://localhost:3000
 Basic usage example for OpenClass Nexus AI
 """
 
-from src.local_inference.complete_pipeline import CompletePipeline
+from src.edge_runtime.complete_pipeline import CompletePipeline
 
 def main():
     """Demonstrate basic usage of OpenClass Nexus AI."""
@@ -588,8 +588,8 @@ if __name__ == "__main__":
 Batch processing example for OpenClass Nexus AI
 """
 
-from src.local_inference.batch_processor import BatchProcessor
-from src.local_inference.performance_monitor import PerformanceMonitor
+from src.edge_runtime.batch_processor import BatchProcessor
+from src.edge_runtime.performance_monitor import PerformanceMonitor
 
 def main():
     """Demonstrate batch processing capabilities."""

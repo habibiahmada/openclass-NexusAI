@@ -318,7 +318,7 @@ def test_property_ai_response_quality_and_curriculum_alignment(
     **Validates: Requirements 2.1, 6.1, 6.2, 6.3, 6.4, 6.5**
     """
     from src.optimization.demonstration_engine import SystemDemonstrationEngine, DemoResponse
-    from src.local_inference.educational_validator import EducationalContentValidator, ValidationLevel
+    from src.edge_runtime.educational_validator import EducationalContentValidator, ValidationLevel
     
     # Create educational validator
     validator = EducationalContentValidator()

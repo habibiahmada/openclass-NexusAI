@@ -12,10 +12,10 @@ from datetime import datetime
 
 from src.embeddings.chroma_manager import ChromaDBManager, SearchResult
 from src.embeddings.bedrock_client import BedrockEmbeddingsClient
-from src.local_inference.inference_engine import InferenceEngine
-from src.local_inference.context_manager import ContextManager, Document
-from src.local_inference.fallback_handler import FallbackHandler, FallbackReason
-from src.local_inference.graceful_degradation import GracefulDegradationManager
+from src.edge_runtime.inference_engine import InferenceEngine
+from src.edge_runtime.context_manager import ContextManager, Document
+from src.edge_runtime.fallback_handler import FallbackHandler, FallbackReason
+from src.edge_runtime.graceful_degradation import GracefulDegradationManager
 
 
 logger = logging.getLogger(__name__)

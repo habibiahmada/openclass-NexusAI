@@ -17,8 +17,8 @@ import pytest
 from hypothesis import given, strategies as st, settings
 import requests
 
-from src.local_inference.model_downloader import ModelDownloader, DownloadProgress
-from src.local_inference.model_config import ModelConfig
+from src.edge_runtime.model_downloader import ModelDownloader, DownloadProgress
+from src.edge_runtime.model_config import ModelConfig
 
 
 # Configure Hypothesis

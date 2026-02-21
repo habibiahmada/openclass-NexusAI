@@ -29,8 +29,8 @@ from dotenv import load_dotenv
 from src.data_processing.etl_pipeline import ETLPipeline, PipelineConfig, PipelineResult
 from src.data_processing.validator import Validator
 from src.data_processing.cost_tracker import CostTracker
-from src.cloud_sync.s3_storage_manager import S3StorageManager
-from src.cloud_sync.cloudfront_manager import CloudFrontManager
+from src.aws_control_plane.s3_storage_manager import S3StorageManager
+from src.aws_control_plane.cloudfront_manager import CloudFrontManager
 from config.app_config import app_config
 
 

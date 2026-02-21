@@ -13,13 +13,13 @@ from unittest.mock import Mock, patch, MagicMock, call
 import pytest
 from botocore.exceptions import ClientError
 
-from src.cloud_sync.s3_storage_manager import S3StorageManager, UploadResult
+from src.aws_control_plane.s3_storage_manager import S3StorageManager, UploadResult
 
 
 @pytest.fixture
 def mock_aws_config():
     """Mock AWS configuration."""
-    with patch('src.cloud_sync.s3_storage_manager.aws_config') as mock_config:
+    with patch('src.aws_control_plane.s3_storage_manager.aws_config') as mock_config:
         mock_config.s3_bucket = "test-bucket"
         mock_config.get_s3_client.return_value = MagicMock()
         yield mock_config

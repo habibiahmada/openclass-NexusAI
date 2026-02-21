@@ -13,25 +13,25 @@ Python 3.9+ (as specified in the design document)
 ## Tasks
 
 - [ ] 0. Phase 0: Preparation and Audit
-  - [ ] 0.1 Create full system backup
+  - [x] 0.1 Create full system backup
     - Create backup of entire codebase, database, and configuration
     - Store backup in `/backups/pre-refactoring/`
     - Verify backup integrity
     - _Requirements: 13.1_
 
-  - [ ] 0.2 Run comprehensive test suite baseline
+  - [x] 0.2 Run comprehensive test suite baseline
     - Execute all existing tests and record results
     - Document current test coverage percentage
     - Create baseline performance metrics
     - _Requirements: 13.2_
 
-  - [ ] 0.3 Create architecture alignment audit checklist
+  - [x] 0.3 Create architecture alignment audit checklist
     - Document current vs. target architecture gaps
     - List all components requiring modification
     - Identify preserved components (no changes)
     - _Requirements: 13.1, 14.1-14.7_
 
-  - [ ] 0.4 Setup Git branching strategy
+  - [x] 0.4 Setup Git branching strategy
     - Create `refactoring/phase-0-preparation` branch
     - Configure branch protection rules
     - Setup commit message templates
@@ -39,38 +39,38 @@ Python 3.9+ (as specified in the design document)
 
 
 - [ ] 1. Phase 1: Folder Structure Alignment
-  - [ ] 1.1 Rename src/local_inference to src/edge_runtime
+  - [x] 1.1 Rename src/local_inference to src/edge_runtime
     - Use `git mv` to preserve history
     - Verify folder rename completed successfully
     - _Requirements: 2.1_
 
-  - [ ] 1.2 Rename src/cloud_sync to src/aws_control_plane
+  - [x] 1.2 Rename src/cloud_sync to src/aws_control_plane
     - Use `git mv` to preserve history
     - Verify folder rename completed successfully
     - _Requirements: 2.2_
 
-  - [ ] 1.3 Move models/cache to models
+  - [x] 1.3 Move models/cache to models
     - Use `git mv` to preserve history
     - Verify folder structure matches target architecture
     - _Requirements: 2.3_
 
-  - [ ] 1.4 Update all import statements automatically
+  - [x] 1.4 Update all import statements automatically
     - Create script to find and replace import paths
     - Update imports from `src.local_inference` to `src.edge_runtime`
     - Update imports from `src.cloud_sync` to `src.aws_control_plane`
     - Verify no old import paths remain in codebase
     - _Requirements: 2.4_
 
-  - [ ]* 1.5 Write property test for import path consistency
+  - [x] 1.5 Write property test for import path consistency
     - **Property 2: Import Path Consistency After Refactoring**
     - **Validates: Requirements 2.4**
 
-  - [ ] 1.6 Run all existing tests after folder restructuring
+  - [x] 1.6 Run all existing tests after folder restructuring
     - Execute full test suite
     - Verify 100% of tests pass
     - _Requirements: 2.5, 13.2_
 
-  - [ ] 1.7 Checkpoint - Commit Phase 1
+  - [-] 1.7 Checkpoint - Commit Phase 1
     - Commit changes with message "Phase 1: Folder structure alignment"
     - Tag commit as `refactoring-phase-1`
     - Ensure all tests pass, ask the user if questions arise.
@@ -119,15 +119,15 @@ Python 3.9+ (as specified in the design document)
     - Update API endpoints to use repositories
     - _Requirements: 3.2_
 
-  - [ ]* 2.8 Write property test for data persistence across restarts
+  - [ ] 2.8 Write property test for data persistence across restarts
     - **Property 3: Data Persistence Across Restarts**
     - **Validates: Requirements 3.3**
 
-  - [ ]* 2.9 Write property test for database transaction atomicity
+  - [ ] 2.9 Write property test for database transaction atomicity
     - **Property 4: Database Transaction Atomicity**
     - **Validates: Requirements 3.4**
 
-  - [ ]* 2.10 Write unit tests for repository operations
+  - [ ] 2.10 Write unit tests for repository operations
     - Test CRUD operations for each repository
     - Test error handling (connection failures, constraint violations)
     - Test edge cases (empty results, duplicate keys)
@@ -190,11 +190,11 @@ Python 3.9+ (as specified in the design document)
     - Setup signed URLs for access control
     - _Requirements: 15.4_
 
-  - [ ]* 3.8 Write property test for AWS infrastructure idempotence
+  - [ ] 3.8 Write property test for AWS infrastructure idempotence
     - **Property 31: AWS Infrastructure Setup Idempotence**
     - **Validates: Requirements 15.7**
 
-  - [ ]* 3.9 Write unit tests for infrastructure setup
+  - [ ] 3.9 Write unit tests for infrastructure setup
     - Test S3 bucket creation
     - Test DynamoDB table creation
     - Test Lambda deployment
@@ -239,23 +239,23 @@ Python 3.9+ (as specified in the design document)
     - Upload to S3 with metadata tags
     - _Requirements: 8.5, 8.6_
 
-  - [ ]* 4.6 Write property test for VKP structure validation
+  - [ ] 4.6 Write property test for VKP structure validation
     - **Property 14: VKP Structure Validation**
     - **Validates: Requirements 6.1, 6.2, 6.6**
 
-  - [ ]* 4.7 Write property test for VKP checksum integrity
+  - [ ] 4.7 Write property test for VKP checksum integrity
     - **Property 16: VKP Checksum Integrity**
     - **Validates: Requirements 6.4**
 
-  - [ ]* 4.8 Write property test for VKP serialization round-trip
+  - [ ] 4.8 Write property test for VKP serialization round-trip
     - **Property 17: VKP Serialization Round-Trip**
     - **Validates: Requirements 6.5**
 
-  - [ ]* 4.9 Write property test for delta update efficiency
+  - [ ] 4.9 Write property test for delta update efficiency
     - **Property 15: VKP Delta Update Efficiency**
     - **Validates: Requirements 6.3**
 
-  - [ ]* 4.10 Write unit tests for VKP packaging
+  - [ ] 4.10 Write unit tests for VKP packaging
     - Test VKP creation with various inputs
     - Test checksum calculation
     - Test serialization/deserialization
@@ -307,19 +307,19 @@ Python 3.9+ (as specified in the design document)
     - Fallback to full download if delta fails
     - _Requirements: 7.3_
 
-  - [ ]* 5.7 Write property test for version comparison correctness
+  - [ ] 5.7 Write property test for version comparison correctness
     - **Property 18: Version Comparison Correctness**
     - **Validates: Requirements 7.2**
 
-  - [ ]* 5.8 Write property test for VKP delta download
+  - [ ] 5.8 Write property test for VKP delta download
     - **Property 19: VKP Delta Download Only**
     - **Validates: Requirements 7.3**
 
-  - [ ]* 5.9 Write property test for checksum verification
+  - [ ] 5.9 Write property test for checksum verification
     - **Property 20: VKP Checksum Verification Before Installation**
     - **Validates: Requirements 7.4**
 
-  - [ ]* 5.10 Write unit tests for VKP puller
+  - [ ] 5.10 Write unit tests for VKP puller
     - Test S3 listing and version comparison
     - Test download and verification
     - Test ChromaDB extraction
@@ -375,27 +375,27 @@ Python 3.9+ (as specified in the design document)
     - Optionally suggest practice questions
     - _Requirements: 4.5_
 
-  - [ ]* 6.7 Write property test for mastery level bounds
+  - [ ] 6.7 Write property test for mastery level bounds
     - **Property 5: Mastery Level Bounds**
     - **Validates: Requirements 4.1**
 
-  - [ ]* 6.8 Write property test for weak area detection
+  - [ ] 6.8 Write property test for weak area detection
     - **Property 6: Weak Area Detection**
     - **Validates: Requirements 4.2**
 
-  - [ ]* 6.9 Write property test for adaptive question difficulty
+  - [ ] 6.9 Write property test for adaptive question difficulty
     - **Property 7: Adaptive Question Difficulty**
     - **Validates: Requirements 4.6**
 
-  - [ ]* 6.10 Write property test for topic classification
+  - [ ] 6.10 Write property test for topic classification
     - **Property 8: Topic Classification and Mastery Update**
     - **Validates: Requirements 4.5**
 
-  - [ ]* 6.11 Write property test for practice question generation
+  - [ ] 6.11 Write property test for practice question generation
     - **Property 9: Adaptive Practice Question Generation**
     - **Validates: Requirements 4.3**
 
-  - [ ]* 6.12 Write unit tests for pedagogical engine
+  - [ ] 6.12 Write unit tests for pedagogical engine
     - Test mastery calculation with various inputs
     - Test weak area detection logic
     - Test question generation
@@ -449,19 +449,19 @@ Python 3.9+ (as specified in the design document)
     - Provide estimated wait time to users
     - _Requirements: 5.3_
 
-  - [ ]* 7.7 Write property test for concurrent thread limit
+  - [ ] 7.7 Write property test for concurrent thread limit
     - **Property 10: Concurrent Thread Limit**
     - **Validates: Requirements 5.1**
 
-  - [ ]* 7.8 Write property test for request queuing
+  - [ ] 7.8 Write property test for request queuing
     - **Property 11: Request Queuing When Capacity Exceeded**
     - **Validates: Requirements 5.3**
 
-  - [ ]* 7.9 Write property test for queue position tracking
+  - [ ] 7.9 Write property test for queue position tracking
     - **Property 12: Queue Position Tracking**
     - **Validates: Requirements 5.6**
 
-  - [ ]* 7.10 Write unit tests for concurrency manager
+  - [ ] 7.10 Write unit tests for concurrency manager
     - Test queue operations
     - Test semaphore limiting
     - Test position tracking
@@ -523,15 +523,15 @@ Python 3.9+ (as specified in the design document)
     - Track latency and success rate
     - _Requirements: 9.1_
 
-  - [ ]* 8.8 Write property test for telemetry anonymization
+  - [ ] 8.8 Write property test for telemetry anonymization
     - **Property 23: Telemetry Data Anonymization**
     - **Validates: Requirements 9.1, 9.2, 9.4, 9.5**
 
-  - [ ]* 8.9 Write property test for AWS data transmission privacy
+  - [ ] 8.9 Write property test for AWS data transmission privacy
     - **Property 33: AWS Data Transmission Privacy**
     - **Validates: Requirements 16.4, 16.5, 16.6, 16.7**
 
-  - [ ]* 8.10 Write unit tests for telemetry system
+  - [ ] 8.10 Write unit tests for telemetry system
     - Test metrics collection and aggregation
     - Test PII verification
     - Test anonymization
@@ -597,19 +597,19 @@ Python 3.9+ (as specified in the design document)
     - Configure auto-restart on failure
     - _Requirements: 10.6_
 
-  - [ ]* 9.8 Write property test for backup compression
+  - [ ] 9.8 Write property test for backup compression
     - **Property 24: Backup Compression**
     - **Validates: Requirements 10.3**
 
-  - [ ]* 9.9 Write property test for version rollback
+  - [ ] 9.9 Write property test for version rollback
     - **Property 25: Version Rollback Round-Trip**
     - **Validates: Requirements 10.4**
 
-  - [ ]* 9.10 Write property test for backup retention
+  - [ ] 9.10 Write property test for backup retention
     - **Property 26: Backup Retention Policy**
     - **Validates: Requirements 10.7**
 
-  - [ ]* 9.11 Write unit tests for resilience module
+  - [ ] 9.11 Write unit tests for resilience module
     - Test backup creation and restoration
     - Test health checks
     - Test auto-restart logic
@@ -665,7 +665,7 @@ Python 3.9+ (as specified in the design document)
     - Allow runtime strategy switching
     - _Requirements: 11.5_
 
-  - [ ]* 10.7 Write unit tests for embedding strategies
+  - [ ] 10.7 Write unit tests for embedding strategies
     - Test Bedrock strategy
     - Test local MiniLM strategy
     - Test strategy manager
@@ -719,23 +719,23 @@ Python 3.9+ (as specified in the design document)
     - Log invalidation count
     - _Requirements: 12.6_
 
-  - [ ]* 11.7 Write property test for cache key consistency
+  - [ ] 11.7 Write property test for cache key consistency
     - **Property 27: Cache Key Consistency**
     - **Validates: Requirements 12.2**
 
-  - [ ]* 11.8 Write property test for cache hit performance
+  - [ ] 11.8 Write property test for cache hit performance
     - **Property 28: Cache Hit Performance**
     - **Validates: Requirements 12.3**
 
-  - [ ]* 11.9 Write property test for cache invalidation
+  - [ ] 11.9 Write property test for cache invalidation
     - **Property 29: Cache Invalidation on VKP Update**
     - **Validates: Requirements 12.6**
 
-  - [ ]* 11.10 Write property test for repeated question caching
+  - [ ] 11.10 Write property test for repeated question caching
     - **Property 30: Repeated Question Caching**
     - **Validates: Requirements 12.1**
 
-  - [ ]* 11.11 Write unit tests for caching layer
+  - [ ] 11.11 Write unit tests for caching layer
     - Test Redis cache operations
     - Test LRU cache operations
     - Test cache manager
@@ -795,7 +795,7 @@ Python 3.9+ (as specified in the design document)
     - Add debugging tips
     - _Requirements: 19.6_
 
-  - [ ]* 12.7 Write property test for documentation consistency
+  - [ ] 12.7 Write property test for documentation consistency
     - **Property 1: Documentation Hardware Specification Consistency**
     - **Validates: Requirements 1.1, 1.3, 1.4**
 
@@ -816,15 +816,15 @@ Python 3.9+ (as specified in the design document)
     - Add error handling and CloudWatch logging
     - _Requirements: 8.1-8.7_
 
-  - [ ]* 13.2 Write property test for PDF text extraction
+  - [ ] 13.2 Write property test for PDF text extraction
     - **Property 21: PDF Text Extraction Completeness**
     - **Validates: Requirements 8.2**
 
-  - [ ]* 13.3 Write property test for text chunking
+  - [ ] 13.3 Write property test for text chunking
     - **Property 22: Text Chunking Parameters**
     - **Validates: Requirements 8.3**
 
-  - [ ]* 13.4 Write unit tests for Lambda processor
+  - [ ] 13.4 Write unit tests for Lambda processor
     - Test PDF extraction
     - Test text chunking
     - Test embedding generation
@@ -839,7 +839,7 @@ Python 3.9+ (as specified in the design document)
     - Scan all AWS API calls for PII
     - _Requirements: 16.1-16.7_
 
-  - [ ]* 13.6 Write property test for local data storage
+  - [ ] 13.6 Write property test for local data storage
     - **Property 32: Local Data Storage Privacy**
     - **Validates: Requirements 16.1, 16.2, 16.3**
 
@@ -850,7 +850,7 @@ Python 3.9+ (as specified in the design document)
     - Verify authentication works offline
     - _Requirements: 17.1-17.5_
 
-  - [ ]* 13.8 Write property test for offline operation
+  - [ ] 13.8 Write property test for offline operation
     - **Property 34: Offline Operation Completeness**
     - **Validates: Requirements 17.1, 17.2, 17.3, 17.5**
 
@@ -862,11 +862,11 @@ Python 3.9+ (as specified in the design document)
     - Measure error rate
     - _Requirements: 18.1-18.6_
 
-  - [ ]* 13.10 Write property test for response latency
+  - [ ] 13.10 Write property test for response latency
     - **Property 13: Response Latency Target**
     - **Validates: Requirements 5.5**
 
-  - [ ]* 13.11 Write property test for file preservation
+  - [ ] 13.11 Write property test for file preservation
     - **Property 35: File Preservation During Refactoring**
     - **Validates: Requirements 14.1-14.7**
 

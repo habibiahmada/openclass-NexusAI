@@ -4,7 +4,7 @@ from unittest.mock import Mock, patch, MagicMock
 import pytest
 from botocore.exceptions import ClientError
 
-from src.cloud_sync.cloudfront_manager import (
+from src.aws_control_plane.cloudfront_manager import (
     CloudFrontManager,
     DistributionInfo,
     InvalidationResult
@@ -14,7 +14,7 @@ from src.cloud_sync.cloudfront_manager import (
 @pytest.fixture
 def mock_aws_config():
     """Mock AWS configuration."""
-    with patch('src.cloud_sync.cloudfront_manager.aws_config') as mock_config:
+    with patch('src.aws_control_plane.cloudfront_manager.aws_config') as mock_config:
         mock_config.s3_bucket = "test-bucket"
         mock_config.region = "ap-southeast-2"
         mock_config.access_key = "test-key"

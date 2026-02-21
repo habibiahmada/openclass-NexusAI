@@ -36,7 +36,7 @@ try:
 except ImportError:
     # Fallback for direct imports
     try:
-        from src.local_inference.model_config import ModelConfig
+        from src.edge_runtime.model_config import ModelConfig
     except ImportError:
         # Mock for testing
         class ModelConfig:

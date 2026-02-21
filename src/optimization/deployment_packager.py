@@ -230,13 +230,13 @@ USER openclass
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \\
-    CMD python -c "from src.local_inference.complete_pipeline import CompletePipeline; print('healthy')"
+    CMD python -c "from src.edge_runtime.complete_pipeline import CompletePipeline; print('healthy')"
 
 # Expose port
 EXPOSE 8000
 
 # Run application
-CMD ["python", "-m", "src.local_inference.complete_pipeline"]
+CMD ["python", "-m", "src.edge_runtime.complete_pipeline"]
 """
         dockerfile = docker_dir / "Dockerfile"
         dockerfile.write_text(dockerfile_content, encoding='utf-8')
@@ -261,7 +261,7 @@ services:
       - OPENCLASS_MAX_MEMORY_GB=4
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "python", "-c", "from src.local_inference.complete_pipeline import CompletePipeline; print('healthy')"]
+      test: ["CMD", "python", "-c", "from src.edge_runtime.complete_pipeline import CompletePipeline; print('healthy')"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -419,7 +419,7 @@ def main():
         else:
             print("1. Activate environment: source openclass-env/bin/activate")
         print("2. Configure AWS (if needed): python scripts/setup_phase2_aws.py")
-        print("3. Run application: python -m src.local_inference.complete_pipeline")
+        print("3. Run application: python -m src.edge_runtime.complete_pipeline")
         
     except Exception as e:
         print(f"\\n❌ Setup failed: {e}")

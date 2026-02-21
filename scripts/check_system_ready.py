@@ -25,8 +25,8 @@ logger = logging.getLogger(__name__)
 def check_model():
     """Check if model is downloaded"""
     try:
-        from src.local_inference.model_config import ModelConfig
-        from src.local_inference.model_downloader import ModelDownloader
+        from src.edge_runtime.model_config import ModelConfig
+        from src.edge_runtime.model_downloader import ModelDownloader
         
         config = ModelConfig()
         downloader = ModelDownloader(cache_dir="./models")

@@ -24,7 +24,7 @@ from pathlib import Path
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from local_inference.config_manager import (
+from edge_runtime.config_manager import (
     ConfigurationManager, ConfigFormat, SystemConfiguration
 )
 

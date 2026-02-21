@@ -14,8 +14,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 import json
 
-from src.local_inference.rag_pipeline import RAGPipeline, QueryResult
-from src.local_inference.educational_validator import EducationalContentValidator, EducationalValidationResult
+from src.edge_runtime.rag_pipeline import RAGPipeline, QueryResult
+from src.edge_runtime.educational_validator import EducationalContentValidator, EducationalValidationResult
 from src.embeddings.chroma_manager import ChromaDBManager, SearchResult
 from src.embeddings.bedrock_client import BedrockEmbeddingsClient
 
@@ -839,8 +839,8 @@ def create_rag_testing_framework(
     Returns:
         RAGPipelineTestingFramework instance
     """
-    from src.local_inference.inference_engine import InferenceEngine
-    from src.local_inference.context_manager import ContextManager
+    from src.edge_runtime.inference_engine import InferenceEngine
+    from src.edge_runtime.context_manager import ContextManager
     
     # Create components
     vector_db = ChromaDBManager(chroma_db_path)

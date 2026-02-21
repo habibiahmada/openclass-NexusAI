@@ -8,7 +8,7 @@ import logging
 from typing import Optional, Dict, Any, Iterator
 from datetime import datetime
 
-from src.local_inference.complete_pipeline import CompletePipeline, PipelineConfig
+from src.edge_runtime.complete_pipeline import CompletePipeline, PipelineConfig
 from src.ui.models import PipelineStatus
 
 logger = logging.getLogger(__name__)

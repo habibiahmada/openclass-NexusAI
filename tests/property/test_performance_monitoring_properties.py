@@ -22,14 +22,14 @@ from hypothesis import given, strategies as st, settings, assume, example
 from hypothesis.stateful import RuleBasedStateMachine, rule, initialize, invariant
 
 # Import the components we're testing
-from src.local_inference.performance_monitor import (
+from src.edge_runtime.performance_monitor import (
     PerformanceTracker, PerformanceMetrics, PerformanceTargets, PerformanceContext
 )
-from src.local_inference.performance_benchmarking import (
+from src.edge_runtime.performance_benchmarking import (
     PerformanceBenchmarkRunner, BenchmarkQuery, BenchmarkResult, 
     IndonesianEducationalBenchmarks, BenchmarkSuite
 )
-from src.local_inference.complete_pipeline import CompletePipeline, PipelineConfig
+from src.edge_runtime.complete_pipeline import CompletePipeline, PipelineConfig
 
 
 # Test data strategies
@@ -120,7 +120,7 @@ class TestPerformanceMonitoringProperties:
             log_file = Path(temp_dir) / "performance.log"
             
             # Setup logging to capture performance logs
-            logger = logging.getLogger('src.local_inference.performance_monitor')
+            logger = logging.getLogger('src.edge_runtime.performance_monitor')
             handler = logging.FileHandler(log_file)
             handler.setLevel(logging.INFO)
             formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')

@@ -81,3 +81,5 @@ backups/*.sqlite3
 backups/vector_db_*/
 backups/.env.backup
 backups/config_backup/
+
+/backups

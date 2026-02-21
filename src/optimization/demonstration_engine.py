@@ -14,10 +14,10 @@ from dataclasses import dataclass, field
 from pathlib import Path
 import json
 
-from src.local_inference.complete_pipeline import CompletePipeline, PipelineConfig
-from src.local_inference.educational_validator import EducationalContentValidator, EducationalValidationResult
-from src.local_inference.performance_monitor import PerformanceMetrics
-from src.local_inference.rag_pipeline import QueryResult
+from src.edge_runtime.complete_pipeline import CompletePipeline, PipelineConfig
+from src.edge_runtime.educational_validator import EducationalContentValidator, EducationalValidationResult
+from src.edge_runtime.performance_monitor import PerformanceMetrics
+from src.edge_runtime.rag_pipeline import QueryResult
 
 logger = logging.getLogger(__name__)
 

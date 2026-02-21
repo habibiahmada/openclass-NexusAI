@@ -32,7 +32,7 @@ try:
 except ImportError:
     # Fallback for direct imports
     try:
-        from src.local_inference.model_packager import ModelPackageMetadata, ChecksumCalculator
+        from src.edge_runtime.model_packager import ModelPackageMetadata, ChecksumCalculator
     except ImportError:
         # Mock for testing
         from dataclasses import dataclass

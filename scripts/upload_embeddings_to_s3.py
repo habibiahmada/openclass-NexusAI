@@ -14,7 +14,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 from dotenv import load_dotenv
-from src.cloud_sync.s3_storage_manager import S3StorageManager
+from src.aws_control_plane.s3_storage_manager import S3StorageManager
 
 # Setup logging
 logging.basicConfig(

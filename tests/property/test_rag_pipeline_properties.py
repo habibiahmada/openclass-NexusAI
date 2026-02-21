@@ -12,10 +12,10 @@ from unittest.mock import Mock, patch, MagicMock
 from typing import List, Dict, Any
 
 from src.optimization.rag_testing_framework import RAGPipelineTestingFramework, RetrievalTestResult
-from src.local_inference.rag_pipeline import RAGPipeline, QueryResult
+from src.edge_runtime.rag_pipeline import RAGPipeline, QueryResult
 from src.embeddings.chroma_manager import ChromaDBManager, SearchResult
-from src.local_inference.inference_engine import InferenceEngine
-from src.local_inference.context_manager import ContextManager, Document
+from src.edge_runtime.inference_engine import InferenceEngine
+from src.edge_runtime.context_manager import ContextManager, Document
 
 
 # Helper strategies for generating test data
@@ -375,7 +375,7 @@ def test_property_educational_content_validation(content_info, data):
     """
     try:
         # Import the educational validator
-        from src.local_inference.educational_validator import EducationalContentValidator, EducationalValidationResult
+        from src.edge_runtime.educational_validator import EducationalContentValidator, EducationalValidationResult
         
         # Create validator instance
         validator = EducationalContentValidator()
