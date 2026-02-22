@@ -410,65 +410,65 @@ Python 3.9+ (as specified in the design document)
     - Ensure all tests pass, ask the user if questions arise.
 
 
-- [ ] 7. Phase 7: Concurrency Management System
-  - [ ] 7.1 Implement ConcurrencyManager class
+- [x] 7. Phase 7: Concurrency Management System
+  - [x] 7.1 Implement ConcurrencyManager class
     - Create async queue using asyncio.Queue
     - Implement semaphore with max_concurrent=5
     - Add enqueue_request() and process_queue() methods
     - Track active and completed requests
     - _Requirements: 5.1, 5.2_
 
-  - [ ] 7.2 Implement InferenceRequest data structure
+  - [x] 7.2 Implement InferenceRequest data structure
     - Create dataclass with queue_id, user_id, question, subject_id, context
     - Add timestamp and priority fields
     - Implement unique queue_id generation
     - _Requirements: 5.2_
 
-  - [ ] 7.3 Implement queue position tracking
+  - [x] 7.3 Implement queue position tracking
     - Create get_queue_position() method
     - Return 0 for active requests
     - Return position in queue for waiting requests
     - Return -1 for completed requests
     - _Requirements: 5.6_
 
-  - [ ] 7.4 Implement TokenStreamer for response streaming
+  - [x] 7.4 Implement TokenStreamer for response streaming
     - Create async stream_response() method
     - Format tokens as Server-Sent Events (SSE)
     - Handle streaming errors gracefully
     - _Requirements: 5.4_
 
-  - [ ] 7.5 Integrate concurrency manager with API endpoints
+  - [x] 7.5 Integrate concurrency manager with API endpoints
     - Update /api/chat endpoint to use queue
     - Return queue position to users
     - Stream responses when ready
     - _Requirements: 5.2, 5.3_
 
-  - [ ] 7.6 Implement queue overflow handling
+  - [x] 7.6 Implement queue overflow handling
     - Set MAX_QUEUE_SIZE = 1000
     - Return HTTP 503 when queue full
     - Provide estimated wait time to users
     - _Requirements: 5.3_
 
-  - [ ] 7.7 Write property test for concurrent thread limit
+  - [x] 7.7 Write property test for concurrent thread limit
     - **Property 10: Concurrent Thread Limit**
     - **Validates: Requirements 5.1**
 
-  - [ ] 7.8 Write property test for request queuing
+  - [x] 7.8 Write property test for request queuing
     - **Property 11: Request Queuing When Capacity Exceeded**
     - **Validates: Requirements 5.3**
 
-  - [ ] 7.9 Write property test for queue position tracking
+  - [x] 7.9 Write property test for queue position tracking
     - **Property 12: Queue Position Tracking**
     - **Validates: Requirements 5.6**
 
-  - [ ] 7.10 Write unit tests for concurrency manager
+  - [x] 7.10 Write unit tests for concurrency manager
     - Test queue operations
     - Test semaphore limiting
     - Test position tracking
     - Test streaming
     - _Requirements: 5.1-5.6_
 
-  - [ ] 7.11 Checkpoint - Verify concurrency limits work
+  - [x] 7.11 Checkpoint - Verify concurrency limits work
     - Submit 10 concurrent requests
     - Verify only 5 process simultaneously
     - Verify remaining 5 are queued

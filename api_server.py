@@ -17,6 +17,7 @@ from pathlib import Path
 import secrets
 import hashlib
 import os
+import asyncio
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -67,6 +68,20 @@ except ImportError as e:
     logger.warning("Server will run without pedagogical tracking")
     create_pedagogical_integration = None
     PEDAGOGY_AVAILABLE = False
+
+# Import concurrency management
+try:
+    from src.concurrency.concurrency_manager import ConcurrencyManager
+    from src.concurrency.inference_request import InferenceRequest
+    from src.concurrency.token_streamer import TokenStreamer
+    CONCURRENCY_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"Concurrency management not available: {e}")
+    logger.warning("Server will run without queue management")
+    ConcurrencyManager = None
+    InferenceRequest = None
+    TokenStreamer = None
+    CONCURRENCY_AVAILABLE = False
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -250,6 +265,11 @@ class AppState:
         # Pedagogical engine
         self.pedagogical_integration = None
         self.pedagogy_initialized = False
+        
+        # Concurrency management
+        self.concurrency_manager = None
+        self.token_streamer = None
+        self.concurrency_initialized = False
     
     def initialize_database(self):
         """Initialize database connection and repositories"""
@@ -308,6 +328,21 @@ class AppState:
         """Initialize complete pipeline"""
         # Initialize database first
         self.initialize_database()
+        
+        # Initialize concurrency manager
+        if CONCURRENCY_AVAILABLE:
+            try:
+                logger.info("Initializing concurrency manager...")
+                self.concurrency_manager = ConcurrencyManager(max_concurrent=5)
+                self.token_streamer = TokenStreamer()
+                self.concurrency_manager.start_processing()
+                self.concurrency_initialized = True
+                logger.info("Concurrency manager initialized successfully")
+            except Exception as e:
+                logger.error(f"Failed to initialize concurrency manager: {e}", exc_info=True)
+                self.concurrency_initialized = False
+        else:
+            logger.warning("Concurrency management not available")
         
         if not RAG_AVAILABLE:
             logger.warning("RAG components not available - running in demo mode")
@@ -541,7 +576,10 @@ async def admin_page():
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest, token_data: Dict = Depends(verify_token)):
     """
-    Main chat endpoint untuk student mode with database persistence
+    Main chat endpoint untuk student mode with database persistence and concurrency management.
+    
+    This endpoint uses the ConcurrencyManager to limit concurrent inference threads
+    and queue additional requests when capacity is exceeded.
     """
     if not state.is_initialized:
         # Demo mode response with helpful instructions
@@ -563,6 +601,159 @@ async def chat(request: ChatRequest, token_data: Dict = Depends(verify_token)):
             confidence=0.0
         )
     
+    # Check if concurrency manager is available
+    if not state.concurrency_initialized:
+        logger.warning("Concurrency manager not available - processing without queue management")
+        return await _process_chat_without_queue(request, token_data)
+    
+    try:
+        # Get subject_id from subject_filter
+        subject_id = None
+        if request.subject_filter and request.subject_filter != "all":
+            try:
+                subjects = state.subject_repo.get_all_subjects()
+                for subject in subjects:
+                    if subject.name.lower() == request.subject_filter.lower():
+                        subject_id = subject.id
+                        break
+            except Exception as e:
+                logger.warning(f"Failed to get subject from database: {e}")
+        
+        # Create inference request
+        inference_req = InferenceRequest(
+            user_id=token_data['user_id'],
+            question=request.message,
+            subject_id=subject_id or 1,  # Default to 1 if no subject
+            context=[]  # Will be populated by RAG pipeline
+        )
+        
+        # Check if queue is full
+        if state.concurrency_manager.is_queue_full():
+            stats = state.concurrency_manager.get_queue_stats()
+            estimated_wait = (stats.queued_count * 5) // 60  # Assume 5 sec per request
+            raise HTTPException(
+                status_code=503,
+                detail=f"Server sedang penuh. Estimasi waktu tunggu: {estimated_wait} menit. Silakan coba lagi nanti."
+            )
+        
+        # Enqueue request
+        queue_id = await state.concurrency_manager.enqueue_request(inference_req)
+        logger.info(f"Request enqueued with queue_id={queue_id}")
+        
+        # Wait for request to become active
+        max_wait_time = 300  # 5 minutes maximum wait
+        wait_interval = 0.5  # Check every 0.5 seconds
+        elapsed = 0
+        
+        while elapsed < max_wait_time:
+            position = state.concurrency_manager.get_queue_position(queue_id)
+            
+            if position == 0:
+                # Request is now active - process it
+                logger.info(f"Processing request {queue_id}")
+                break
+            elif position == -1:
+                # Request already completed (shouldn't happen here)
+                logger.warning(f"Request {queue_id} already completed")
+                break
+            elif position == -2:
+                # Request not found
+                logger.error(f"Request {queue_id} not found in queue")
+                raise HTTPException(status_code=500, detail="Request lost in queue")
+            else:
+                # Still queued - wait
+                await asyncio.sleep(wait_interval)
+                elapsed += wait_interval
+        
+        if elapsed >= max_wait_time:
+            raise HTTPException(
+                status_code=504,
+                detail="Request timeout - server too busy"
+            )
+        
+        # Process with complete pipeline
+        result = state.pipeline.process_query(
+            query=request.message,
+            subject_filter=request.subject_filter if request.subject_filter != "all" else None
+        )
+        
+        # Save to database if available
+        if state.db_initialized and state.chat_history_repo:
+            try:
+                subject_name = 'informatika'  # Default subject
+                
+                if request.subject_filter and request.subject_filter != "all":
+                    try:
+                        subjects = state.subject_repo.get_all_subjects()
+                        for subject in subjects:
+                            if subject.name.lower() == request.subject_filter.lower():
+                                subject_id = subject.id
+                                subject_name = subject.name
+                                break
+                    except Exception as e:
+                        logger.warning(f"Failed to get subject from database: {e}")
+                
+                state.chat_history_repo.save_chat(
+                    user_id=token_data['user_id'],
+                    subject_id=subject_id,
+                    question=request.message,
+                    response=result.response,
+                    confidence=0.0
+                )
+                logger.info(f"Chat saved to database for user_id={token_data['user_id']}")
+                
+                # Process with pedagogical engine if available
+                if state.pedagogy_initialized and state.pedagogical_integration:
+                    try:
+                        pedagogical_result = state.pedagogical_integration.process_student_question(
+                            user_id=token_data['user_id'],
+                            subject_id=subject_id or 1,
+                            question=request.message,
+                            subject_name=subject_name,
+                            suggest_practice=False
+                        )
+                        
+                        if pedagogical_result['success']:
+                            logger.info(
+                                f"Pedagogical tracking updated: "
+                                f"topic={pedagogical_result['topic']}, "
+                                f"mastery={pedagogical_result['mastery_level']:.2f}, "
+                                f"weak_areas={pedagogical_result['weak_areas_count']}"
+                            )
+                    except Exception as e:
+                        logger.error(f"Failed to process pedagogical tracking: {e}", exc_info=True)
+                
+            except Exception as e:
+                logger.error(f"Failed to save chat to database: {e}", exc_info=True)
+        
+        # Extract source information
+        source = None
+        if result.sources:
+            source = ", ".join([s.get("title", "Unknown") for s in result.sources[:2]])
+        
+        return ChatResponse(
+            response=result.response,
+            source=source,
+            confidence=0.0
+        )
+        
+    except asyncio.QueueFull:
+        raise HTTPException(
+            status_code=503,
+            detail="Server sedang penuh. Silakan coba lagi nanti."
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error processing chat: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+async def _process_chat_without_queue(request: ChatRequest, token_data: Dict):
+    """
+    Fallback function to process chat without concurrency management.
+    Used when ConcurrencyManager is not available.
+    """
     try:
         logger.info(f"Received question from user {token_data['username']}: {request.message[:50]}...")
         
@@ -575,12 +766,10 @@ async def chat(request: ChatRequest, token_data: Dict = Depends(verify_token)):
         # Save to database if available
         if state.db_initialized and state.chat_history_repo:
             try:
-                # Get subject_id from subject_filter
                 subject_id = None
-                subject_name = 'informatika'  # Default subject
+                subject_name = 'informatika'
                 
                 if request.subject_filter and request.subject_filter != "all":
-                    # Try to get subject from database
                     try:
                         subjects = state.subject_repo.get_all_subjects()
                         for subject in subjects:
@@ -591,50 +780,37 @@ async def chat(request: ChatRequest, token_data: Dict = Depends(verify_token)):
                     except Exception as e:
                         logger.warning(f"Failed to get subject from database: {e}")
                 
-                # Save chat to database
-                # Note: QueryResult doesn't have confidence, use 0.0 as default
                 state.chat_history_repo.save_chat(
                     user_id=token_data['user_id'],
                     subject_id=subject_id,
                     question=request.message,
                     response=result.response,
-                    confidence=0.0  # QueryResult doesn't have confidence attribute
+                    confidence=0.0
                 )
                 logger.info(f"Chat saved to database for user_id={token_data['user_id']}")
                 
-                # Process with pedagogical engine if available
                 if state.pedagogy_initialized and state.pedagogical_integration:
                     try:
                         pedagogical_result = state.pedagogical_integration.process_student_question(
                             user_id=token_data['user_id'],
-                            subject_id=subject_id or 1,  # Use 1 as default if no subject
+                            subject_id=subject_id or 1,
                             question=request.message,
                             subject_name=subject_name,
-                            suggest_practice=False  # Don't suggest practice by default
+                            suggest_practice=False
                         )
                         
                         if pedagogical_result['success']:
                             logger.info(
                                 f"Pedagogical tracking updated: "
                                 f"topic={pedagogical_result['topic']}, "
-                                f"mastery={pedagogical_result['mastery_level']:.2f}, "
-                                f"weak_areas={pedagogical_result['weak_areas_count']}"
+                                f"mastery={pedagogical_result['mastery_level']:.2f}"
                             )
-                        else:
-                            logger.warning(f"Pedagogical tracking failed: {pedagogical_result.get('error')}")
-                    
                     except Exception as e:
                         logger.error(f"Failed to process pedagogical tracking: {e}", exc_info=True)
-                        # Continue even if pedagogical tracking fails
                 
             except Exception as e:
                 logger.error(f"Failed to save chat to database: {e}", exc_info=True)
-                logger.warning("Continuing without saving chat history")
-                # Continue even if database save fails - don't block user interaction
-        else:
-            logger.warning("Database not available - chat history not saved")
         
-        # Extract source information
         source = None
         if result.sources:
             source = ", ".join([s.get("title", "Unknown") for s in result.sources[:2]])
@@ -642,12 +818,182 @@ async def chat(request: ChatRequest, token_data: Dict = Depends(verify_token)):
         return ChatResponse(
             response=result.response,
             source=source,
-            confidence=0.0  # QueryResult doesn't have confidence attribute
+            confidence=0.0
         )
         
     except Exception as e:
         logger.error(f"Error processing chat: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/chat/stream")
+async def chat_stream(request: ChatRequest, token_data: Dict = Depends(verify_token)):
+    """
+    Streaming chat endpoint with concurrency management and queue support.
+    
+    This endpoint uses the ConcurrencyManager to limit concurrent inference threads
+    and queue additional requests. Returns Server-Sent Events (SSE) for real-time
+    token streaming.
+    """
+    if not state.is_initialized:
+        # Return error as SSE
+        async def demo_stream():
+            yield "data: {\"error\": \"Sistema AI belum diinisialisasi\"}\n\n"
+        
+        return StreamingResponse(
+            demo_stream(),
+            media_type="text/event-stream"
+        )
+    
+    if not state.concurrency_initialized:
+        # Fallback to non-streaming endpoint
+        logger.warning("Concurrency manager not available - falling back to synchronous processing")
+        result = await chat(request, token_data)
+        
+        async def fallback_stream():
+            yield f"data: {{\"token\": \"{result.response}\"}}\n\n"
+            yield "data: {\"done\": true}\n\n"
+        
+        return StreamingResponse(
+            fallback_stream(),
+            media_type="text/event-stream"
+        )
+    
+    try:
+        # Get subject_id from subject_filter
+        subject_id = None
+        if request.subject_filter and request.subject_filter != "all":
+            try:
+                subjects = state.subject_repo.get_all_subjects()
+                for subject in subjects:
+                    if subject.name.lower() == request.subject_filter.lower():
+                        subject_id = subject.id
+                        break
+            except Exception as e:
+                logger.warning(f"Failed to get subject from database: {e}")
+        
+        # Create inference request
+        inference_req = InferenceRequest(
+            user_id=token_data['user_id'],
+            question=request.message,
+            subject_id=subject_id or 1,  # Default to 1 if no subject
+            context=[]  # Will be populated by RAG pipeline
+        )
+        
+        # Check if queue is full
+        if state.concurrency_manager.is_queue_full():
+            # Return HTTP 503 with estimated wait time
+            stats = state.concurrency_manager.get_queue_stats()
+            estimated_wait = (stats.queued_count * 5) // 60  # Assume 5 sec per request
+            
+            async def queue_full_stream():
+                yield f"data: {{\"error\": \"Queue penuh. Estimasi waktu tunggu: {estimated_wait} menit\"}}\n\n"
+            
+            return StreamingResponse(
+                queue_full_stream(),
+                media_type="text/event-stream",
+                status_code=503
+            )
+        
+        # Enqueue request
+        queue_id = await state.concurrency_manager.enqueue_request(inference_req)
+        
+        # Stream response with queue position updates
+        async def stream_with_queue():
+            # Send initial queue position
+            position = state.concurrency_manager.get_queue_position(queue_id)
+            yield state.token_streamer.format_sse_queue_position(position, queue_id)
+            
+            # Wait for request to become active
+            while position > 0:
+                await asyncio.sleep(1)
+                position = state.concurrency_manager.get_queue_position(queue_id)
+                yield state.token_streamer.format_sse_queue_position(position, queue_id)
+            
+            # Process query when active
+            if position == 0:
+                # Process with complete pipeline
+                result = state.pipeline.process_query(
+                    query=request.message,
+                    subject_filter=request.subject_filter if request.subject_filter != "all" else None
+                )
+                
+                # Stream the response
+                # For now, send the complete response as tokens
+                # In future, integrate with actual streaming LLM
+                for char in result.response:
+                    yield state.token_streamer.format_sse(char, queue_id)
+                    await asyncio.sleep(0.01)  # Small delay for streaming effect
+                
+                # Send completion
+                yield state.token_streamer.format_sse_complete(queue_id)
+                
+                # Save to database if available
+                if state.db_initialized and state.chat_history_repo:
+                    try:
+                        state.chat_history_repo.save_chat(
+                            user_id=token_data['user_id'],
+                            subject_id=subject_id,
+                            question=request.message,
+                            response=result.response,
+                            confidence=0.0
+                        )
+                        logger.info(f"Chat saved to database for user_id={token_data['user_id']}")
+                    except Exception as e:
+                        logger.error(f"Failed to save chat: {e}", exc_info=True)
+        
+        return StreamingResponse(
+            stream_with_queue(),
+            media_type="text/event-stream"
+        )
+        
+    except asyncio.QueueFull:
+        # Queue is full
+        async def queue_full_stream():
+            yield "data: {\"error\": \"Server sedang penuh. Silakan coba lagi nanti.\"}\n\n"
+        
+        return StreamingResponse(
+            queue_full_stream(),
+            media_type="text/event-stream",
+            status_code=503
+        )
+    
+    except Exception as e:
+        logger.error(f"Error in streaming chat: {e}", exc_info=True)
+        
+        async def error_stream():
+            yield f"data: {{\"error\": \"{str(e)}\"}}\n\n"
+        
+        return StreamingResponse(
+            error_stream(),
+            media_type="text/event-stream",
+            status_code=500
+        )
+
+
+@app.get("/api/queue/stats")
+async def get_queue_stats(token_data: Dict = Depends(verify_token)):
+    """
+    Get current queue statistics.
+    
+    Returns information about active requests, queued requests, and system capacity.
+    """
+    if not state.concurrency_initialized:
+        raise HTTPException(
+            status_code=503,
+            detail="Concurrency manager not available"
+        )
+    
+    stats = state.concurrency_manager.get_queue_stats()
+    
+    return {
+        "active_count": stats.active_count,
+        "queued_count": stats.queued_count,
+        "completed_count": stats.completed_count,
+        "max_concurrent": stats.max_concurrent,
+        "queue_full": state.concurrency_manager.is_queue_full(),
+        "max_queue_size": ConcurrencyManager.MAX_QUEUE_SIZE
+    }
 
 # ===========================
 # Pedagogical Engine Endpoints
