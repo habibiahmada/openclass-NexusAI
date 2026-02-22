@@ -27,6 +27,7 @@ huggingface_hub>=0.20.0
 
 # Database
 psycopg2-binary>=2.9.9
+redis>=5.0.0
 
 # Utilities
 python-dotenv>=1.0.0

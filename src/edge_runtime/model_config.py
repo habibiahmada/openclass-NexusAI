@@ -3,7 +3,7 @@ Model configuration and management for Phase 3 local inference.
 
 This module provides configuration classes and utilities for managing
 AI models in the OpenClass Nexus AI system, specifically optimized
-for Llama-3.2-3B-Instruct running on 4GB RAM systems.
+for Llama-3.2-3B-Instruct running on school servers with 16GB RAM.
 """
 
 from dataclasses import dataclass
@@ -14,11 +14,11 @@ import os
 
 @dataclass
 class ModelConfig:
-    """Configuration for Llama-3.2-3B-Instruct model optimized for 4GB RAM systems.
+    """Configuration for Llama-3.2-3B-Instruct model optimized for school servers.
     
     This configuration follows the design specifications for Phase 3,
     targeting the optimal balance between performance and resource usage
-    for Indonesian educational content.
+    for Indonesian educational content on 16GB RAM school servers.
     """
     
     # Model identification
@@ -91,10 +91,10 @@ class ModelConfig:
 
 @dataclass
 class InferenceConfig:
-    """Configuration for local inference engine optimized for 4GB RAM systems.
+    """Configuration for local inference engine optimized for school servers.
     
     These settings are specifically tuned for running Llama-3.2-3B-Instruct
-    efficiently on resource-constrained hardware while maintaining
+    efficiently on school server hardware (16GB RAM, 8-core CPU) while maintaining
     educational content quality.
     """
     
@@ -112,10 +112,9 @@ class InferenceConfig:
     top_k: int = 40           # Top-k sampling
     repeat_penalty: float = 1.1  # Repetition penalty
     
-    # Memory management
-    memory_limit_mb: int = 3072  # Memory limit (3GB for 4GB systems)
+    # Memory management (removed memory_limit_mb constraint)
     use_mmap: bool = True        # Use memory mapping for efficiency
-    use_mlock: bool = False      # Lock model in memory (disabled for 4GB systems)
+    use_mlock: bool = False      # Lock model in memory
     
     # Performance settings
     batch_size: int = 512      # Batch size for processing
@@ -125,11 +124,7 @@ class InferenceConfig:
         """Validate and adjust configuration after creation."""
         # Auto-detect optimal thread count if not specified
         if self.n_threads <= 0:
-            self.n_threads = min(os.cpu_count() or 4, 6)  # Cap at 6 threads
-        
-        # Ensure memory limit is reasonable for 4GB systems
-        if self.memory_limit_mb > 3584:  # Leave 512MB for OS
-            self.memory_limit_mb = 3072
+            self.n_threads = min(os.cpu_count() or 4, 8)  # Cap at 8 threads for 8-core systems
     
     def get_llama_cpp_params(self) -> Dict[str, Any]:
         """Get parameters formatted for llama-cpp-python."""
@@ -172,7 +167,6 @@ QUALITY_INFERENCE_CONFIG = InferenceConfig(
 MEMORY_OPTIMIZED_CONFIG = InferenceConfig(
     n_ctx=2048,       # Smaller context window
     max_tokens=256,   # Shorter responses
-    memory_limit_mb=2048,  # Lower memory limit
     batch_size=256,   # Smaller batch size
     use_mlock=False   # Disable memory locking
 )

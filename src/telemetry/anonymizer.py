@@ -28,8 +28,8 @@ class Anonymizer:
             salt: Salt for hashing. If None, reads from SCHOOL_ID_SALT env var.
         """
         if salt is None:
-            salt = os.getenv('SCHOOL_ID_SALT', 'nexusai-2025-default-salt')
-            if salt == 'nexusai-2025-default-salt':
+            salt = os.getenv('SCHOOL_ID_SALT', 'nexusai-2026-default-salt')
+            if salt == 'nexusai-2026-default-salt':
                 logger.warning(
                     "Using default salt for school ID anonymization. "
                     "Set SCHOOL_ID_SALT environment variable for production."

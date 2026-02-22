@@ -42,6 +42,10 @@ class AppState:
         # Resilience
         self.resilience_service = None
         self.resilience_initialized = False
+        
+        # Caching layer
+        self.cache_manager = None
+        self.cache_initialized = False
     
     def initialize_database(self) -> bool:
         """Initialize database connection and repositories"""
@@ -164,6 +168,37 @@ class AppState:
             logger.error(f"Failed to initialize resilience service: {e}", exc_info=True)
             return False
     
+    def initialize_cache(self) -> bool:
+        """Initialize cache manager"""
+        try:
+            from src.persistence.cache_manager import CacheManager
+            
+            logger.info("Initializing cache manager...")
+            
+            # Get Redis URL from environment (optional)
+            redis_url = os.getenv('REDIS_URL')
+            
+            if redis_url:
+                logger.info(f"Redis URL configured: {redis_url}")
+            else:
+                logger.info("No Redis URL configured - using LRU fallback")
+            
+            # Initialize cache manager (will fallback to LRU if Redis unavailable)
+            self.cache_manager = CacheManager(redis_url=redis_url)
+            self.cache_initialized = True
+            
+            # Get cache stats
+            stats = self.cache_manager.get_stats()
+            logger.info(f"Cache manager initialized successfully (backend: {stats.backend})")
+            return True
+            
+        except ImportError:
+            logger.warning("Cache components not available")
+            return False
+        except Exception as e:
+            logger.error(f"Failed to initialize cache manager: {e}", exc_info=True)
+            return False
+    
     def initialize_pipeline(self) -> bool:
         """Initialize RAG pipeline"""
         try:
@@ -213,6 +248,9 @@ class AppState:
         # Initialize database first
         self.initialize_database()
         
+        # Initialize cache manager
+        self.initialize_cache()
+        
         # Initialize concurrency manager
         self.initialize_concurrency()
         
@@ -227,6 +265,7 @@ class AppState:
         
         logger.info("Application initialization complete")
         logger.info(f"Database: {'✓' if self.db_initialized else '✗'}")
+        logger.info(f"Cache: {'✓' if self.cache_initialized else '✗'}")
         logger.info(f"Concurrency: {'✓' if self.concurrency_initialized else '✗'}")
         logger.info(f"Telemetry: {'✓' if self.telemetry_initialized else '✗'}")
         logger.info(f"Resilience: {'✓' if self.resilience_initialized else '✗'}")

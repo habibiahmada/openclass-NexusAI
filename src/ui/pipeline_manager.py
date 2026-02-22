@@ -38,12 +38,11 @@ class PipelineManager:
         try:
             logger.info("Initializing Complete Pipeline...")
             
-            # Create pipeline configuration optimized for 4GB systems
+            # Create pipeline configuration optimized for school servers
             config = PipelineConfig(
                 model_cache_dir="./models/cache",
                 chroma_db_path="./data/vector_db",
                 chroma_collection_name="educational_content",
-                memory_limit_mb=3072,
                 enable_batch_processing=False,  # Disable for simpler UI
                 enable_performance_monitoring=True,
                 enable_graceful_degradation=True,

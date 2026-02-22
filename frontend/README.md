@@ -204,7 +204,7 @@ Untuk kontribusi UI/UX, silakan buat pull request dengan:
 
 **Dibuat sesuai rekomendasi di `platform_base.md`**
 - ✅ Offline-first
-- ✅ Stabil di low-spec (RAM 4GB)
+- ✅ Optimized for school servers (16GB RAM)
 - ✅ Mudah dipasang
 - ✅ Mudah digunakan (SD-SMA)
 - ✅ Mudah dipelihara

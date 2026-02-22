@@ -43,8 +43,7 @@ class PipelineConfig:
     enable_batch_processing: bool = True
     enable_graceful_degradation: bool = True
     
-    # Resource limits
-    memory_limit_mb: int = 3072  # 3GB for 4GB systems
+    # Resource limits (removed memory_limit_mb constraint)
     max_concurrent_queries: int = 2
     
     # ChromaDB settings
@@ -484,10 +483,9 @@ class CompletePipeline:
         """Initialize resource monitoring components."""
         logger.info("Initializing resource monitoring...")
         
-        self.memory_monitor = MemoryMonitor(memory_limit_mb=self.config.memory_limit_mb)
+        self.memory_monitor = MemoryMonitor()
         self.thread_manager = ThreadManager()
         
-        logger.info(f"Memory limit set to {self.config.memory_limit_mb}MB")
         logger.info(f"Optimal thread count: {self.thread_manager.optimal_threads}")
     
     def _initialize_model_management(self) -> None:
@@ -756,7 +754,6 @@ class CompletePipeline:
 def create_complete_pipeline(
     model_cache_dir: str = "./models/cache",
     chroma_db_path: str = "./data/vector_db",
-    memory_limit_mb: int = 3072,
     enable_batch_processing: bool = True,
     enable_performance_monitoring: bool = True,
     log_level: str = "INFO"
@@ -767,7 +764,6 @@ def create_complete_pipeline(
     Args:
         model_cache_dir: Directory for model storage
         chroma_db_path: Path to ChromaDB database
-        memory_limit_mb: Memory limit for the system
         enable_batch_processing: Enable batch processing capabilities
         enable_performance_monitoring: Enable performance monitoring
         log_level: Logging level
@@ -778,7 +774,6 @@ def create_complete_pipeline(
     config = PipelineConfig(
         model_cache_dir=model_cache_dir,
         chroma_db_path=chroma_db_path,
-        memory_limit_mb=memory_limit_mb,
         enable_batch_processing=enable_batch_processing,
         enable_performance_monitoring=enable_performance_monitoring,
         log_level=log_level
@@ -797,7 +792,6 @@ def example_pipeline_usage():
     config = PipelineConfig(
         model_cache_dir="./models/cache",
         chroma_db_path="./data/vector_db",
-        memory_limit_mb=3072,
         enable_batch_processing=True,
         enable_performance_monitoring=True,
         log_level="INFO"

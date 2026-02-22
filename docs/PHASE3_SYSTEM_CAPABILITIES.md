@@ -2,14 +2,14 @@
 
 ## Overview
 
-After Phase 3 completion, OpenClass Nexus AI is a fully functional offline AI tutoring system optimized for Indonesian educational content. The system runs efficiently on 4GB RAM laptops and provides curriculum-aligned responses for high school students.
+After Phase 3 completion, OpenClass Nexus AI is a fully functional offline AI tutoring system optimized for Indonesian educational content. The system runs efficiently on school servers with 16GB RAM and provides curriculum-aligned responses for high school students.
 
 ## Core System Capabilities
 
 ### 1. Local AI Inference Engine 🤖
 
 **Model**: Llama-3.2-3B-Instruct (GGUF format)
-**Memory Optimization**: 4GB RAM constraint
+**Memory Optimization**: Optimized for school server deployment
 **Language Support**: Indonesian (Bahasa Indonesia)
 
 ```python

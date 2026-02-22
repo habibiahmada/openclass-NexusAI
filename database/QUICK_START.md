@@ -114,7 +114,7 @@ pg_dump -U postgres nexusai > backup_$(date +%Y%m%d).sql
 
 ### Restore Database
 ```bash
-psql -U postgres -d nexusai < backup_20250115.sql
+psql -U postgres -d nexusai < backup_20260215.sql
 ```
 
 ## Troubleshooting

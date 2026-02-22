@@ -759,7 +759,7 @@ Standardized format for packaging, versioning, and distributing curriculum embed
   "subject": "matematika",
   "grade": 11,
   "semester": 1,
-  "created_at": "2025-01-15T10:30:00Z",
+  "created_at": "2026-02-15T10:30:00Z",
   "embedding_model": "amazon.titan-embed-text-v1",
   "chunk_config": {
     "chunk_size": 800,
@@ -1382,7 +1382,7 @@ import hashlib
 
 def anonymize_school_id(school_id: str) -> str:
     # One-way hash with salt
-    salt = os.getenv('TELEMETRY_SALT', 'nexusai-2025')
+    salt = os.getenv('TELEMETRY_SALT', 'nexusai-2026')
     combined = f"{school_id}:{salt}"
     hashed = hashlib.sha256(combined.encode()).hexdigest()
     return f"school_{hashed[:16]}"

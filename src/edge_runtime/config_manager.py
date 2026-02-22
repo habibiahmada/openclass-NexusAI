@@ -176,11 +176,11 @@ class HardwareDetector:
             recommended_memory_limit_mb = int(total_memory_gb * 1024 * 0.5)  # 50% of total
             recommended_context_size = 3072
             recommended_batch_size = 384
-        else:  # 4GB or less
+        else:  # Lower memory systems
             profile_name = "low_resource"
             performance_tier = "low"
             recommended_threads = min(cpu_threads, 4)
-            recommended_memory_limit_mb = 3072  # Leave 1GB for OS
+            recommended_memory_limit_mb = int(total_memory_gb * 1024 * 0.7)  # 70% of total
             recommended_context_size = 2048
             recommended_batch_size = 256
         
@@ -205,7 +205,6 @@ class HardwareDetector:
         return InferenceConfig(
             n_ctx=hardware_profile.recommended_context_size,
             n_threads=hardware_profile.recommended_threads,
-            memory_limit_mb=hardware_profile.recommended_memory_limit_mb,
             batch_size=hardware_profile.recommended_batch_size,
             
             # Adjust generation parameters based on performance tier
@@ -288,9 +287,6 @@ class ConfigurationValidator:
         
         if not (0.0 <= config.top_p <= 1.0):
             errors.append("top_p must be between 0.0 and 1.0")
-        
-        if config.memory_limit_mb <= 0:
-            errors.append("memory_limit_mb must be positive")
         
         return errors
     

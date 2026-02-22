@@ -213,7 +213,7 @@ def main():
     try:
         # Initialize resource monitoring components
         print("Initializing resource monitoring...")
-        memory_monitor = MemoryMonitor(memory_limit_mb=3072)
+        memory_monitor = MemoryMonitor()
         thread_manager = ThreadManager()
         performance_tracker = PerformanceTracker()
         

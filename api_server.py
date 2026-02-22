@@ -28,6 +28,7 @@ from src.api.routers.teacher_router import create_teacher_router
 from src.api.routers.admin_router import create_admin_router
 from src.api.routers.pedagogy_router import create_pedagogy_router
 from src.api.routers.queue_router import create_queue_router
+from src.api.routers.cache_router import create_cache_router
 
 # Configure logging
 logging.basicConfig(
@@ -113,12 +114,24 @@ async def health_check():
         "status": "healthy",
         "initialized": app_state.is_initialized,
         "database": app_state.db_initialized,
+        "cache": app_state.cache_initialized,
         "concurrency": app_state.concurrency_initialized,
         "pedagogy": app_state.pedagogy_initialized,
         "telemetry": app_state.telemetry_initialized,
         "resilience": app_state.resilience_initialized,
         "version": "1.0.0"
     }
+    
+    # Add cache statistics if available
+    if app_state.cache_initialized and app_state.cache_manager:
+        cache_stats = app_state.cache_manager.get_stats()
+        health_status["cache_stats"] = {
+            "backend": cache_stats.backend,
+            "hits": cache_stats.hits,
+            "misses": cache_stats.misses,
+            "hit_rate": cache_stats.hit_rate,
+            "total_keys": cache_stats.total_keys
+        }
     
     # Add detailed health checks if resilience service is available
     if app_state.resilience_initialized and app_state.resilience_service:
@@ -186,6 +199,10 @@ app.include_router(pedagogy_router)
 # Queue router (concurrency statistics)
 queue_router = create_queue_router(app_state, verify_token)
 app.include_router(queue_router)
+
+# Cache router (cache management)
+cache_router = create_cache_router(app_state, require_admin)
+app.include_router(cache_router)
 
 # ===========================
 # Run Server

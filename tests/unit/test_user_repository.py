@@ -34,8 +34,8 @@ def sample_user_data():
         'password_hash': hashlib.sha256('password123'.encode()).hexdigest(),
         'role': 'siswa',
         'full_name': 'Ahmad Rizki',
-        'created_at': datetime(2025, 1, 15, 10, 30, 0),
-        'updated_at': datetime(2025, 1, 15, 10, 30, 0)
+        'created_at': datetime(2026, 2, 20, 10, 30, 0),
+        'updated_at': datetime(2026, 2, 20, 10, 30, 0)
     }
 
 

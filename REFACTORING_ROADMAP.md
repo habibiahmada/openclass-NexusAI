@@ -1,6 +1,6 @@
 # 🔧 REFACTORING ROADMAP: Merapihkan Arsitektur Existing
 
-**Tanggal:** 2025-01-XX  
+**Tanggal:** 2026-02-20  
 **Tujuan:** Align existing code dengan arsitektur definitif tanpa break functionality  
 **Prinsip:** Incremental, Tested, Backward Compatible
 
@@ -174,7 +174,7 @@ sudo apt install postgresql postgresql-contrib
 
 # Create database
 sudo -u postgres psql -c "CREATE DATABASE nexusai_school;"
-sudo -u postgres psql -c "CREATE USER nexusai WITH PASSWORD 'nexusai2025';"
+sudo -u postgres psql -c "CREATE USER nexusai WITH PASSWORD 'nexusai2026';"
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE nexusai_school TO nexusai;"
 ```
 
@@ -315,7 +315,7 @@ class Session(Base):
     user = relationship("User", back_populates="sessions")
 
 # Database connection
-DATABASE_URL = "postgresql://nexusai:nexusai2025@localhost/nexusai_school"
+DATABASE_URL = "postgresql://nexusai:nexusai2026@localhost/nexusai_school"
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine)
 

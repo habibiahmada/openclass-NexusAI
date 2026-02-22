@@ -680,62 +680,62 @@ Python 3.9+ (as specified in the design document)
     - Ensure all tests pass, ask the user if questions arise.
 
 
-- [ ] 11. Phase 11: Caching Layer
-  - [ ] 11.1 Implement CacheManager class
+- [x] 11. Phase 11: Caching Layer
+  - [x] 11.1 Implement CacheManager class
     - Create get(), set(), delete() methods
     - Add invalidate_pattern() for bulk invalidation
     - Implement get_stats() for cache metrics
     - Support both Redis and LRU fallback
     - _Requirements: 12.1, 12.2_
 
-  - [ ] 11.2 Implement RedisCache class
+  - [x] 11.2 Implement RedisCache class
     - Create Redis client connection
     - Implement cache operations with TTL
     - Add pattern-based deletion
     - Handle connection errors gracefully
     - _Requirements: 12.1_
 
-  - [ ] 11.3 Implement LRUCache class
+  - [x] 11.3 Implement LRUCache class
     - Create in-memory LRU cache (max 1000 items)
     - Implement eviction policy
     - Add thread-safe operations
     - _Requirements: 12.5_
 
-  - [ ] 11.4 Implement cache key generation
+  - [x] 11.4 Implement cache key generation
     - Create generate_cache_key() using SHA256 hash
     - Include question, subject_id, vkp_version in key
     - Normalize question text (lowercase, strip)
     - _Requirements: 12.2_
 
-  - [ ] 11.5 Integrate caching with RAG pipeline
+  - [x] 11.5 Integrate caching with RAG pipeline
     - Check cache before RAG query
     - Store response in cache after generation
     - Set TTL to 24 hours
     - _Requirements: 12.1, 12.3, 12.4_
 
-  - [ ] 11.6 Implement cache invalidation on VKP update
+  - [x] 11.6 Implement cache invalidation on VKP update
     - Invalidate all cached responses for updated subject
     - Use pattern matching for bulk deletion
     - Log invalidation count
     - _Requirements: 12.6_
 
-  - [ ] 11.7 Write property test for cache key consistency
+  - [x] 11.7 Write property test for cache key consistency
     - **Property 27: Cache Key Consistency**
     - **Validates: Requirements 12.2**
 
-  - [ ] 11.8 Write property test for cache hit performance
+  - [x] 11.8 Write property test for cache hit performance
     - **Property 28: Cache Hit Performance**
     - **Validates: Requirements 12.3**
 
-  - [ ] 11.9 Write property test for cache invalidation
+  - [x] 11.9 Write property test for cache invalidation
     - **Property 29: Cache Invalidation on VKP Update**
     - **Validates: Requirements 12.6**
 
-  - [ ] 11.10 Write property test for repeated question caching
+  - [x] 11.10 Write property test for repeated question caching
     - **Property 30: Repeated Question Caching**
     - **Validates: Requirements 12.1**
 
-  - [ ] 11.11 Write unit tests for caching layer
+  - [x] 11.11 Write unit tests for caching layer
     - Test Redis cache operations
     - Test LRU cache operations
     - Test cache manager
@@ -743,7 +743,7 @@ Python 3.9+ (as specified in the design document)
     - Test invalidation
     - _Requirements: 12.1-12.6_
 
-  - [ ] 11.12 Checkpoint - Verify caching improves performance
+  - [x] 11.12 Checkpoint - Verify caching improves performance
     - Ask same question twice
     - Verify first request hits database
     - Verify second request hits cache (< 500ms)
@@ -751,22 +751,22 @@ Python 3.9+ (as specified in the design document)
     - Ensure all tests pass, ask the user if questions arise.
 
 
-- [ ] 12. Phase 12: Documentation and Configuration Updates
-  - [ ] 12.1 Update hardware specifications in all documentation
+- [x] 12. Phase 12: Documentation and Configuration Updates
+  - [x] 12.1 Update hardware specifications in all documentation
     - Update README.md to specify 16GB RAM minimum
     - Update all references from 4GB to 16GB
     - Update hardware specs to 16GB RAM, 8-core CPU, 512GB SSD
     - Remove memory_limit_mb = 3072 constraint from config
     - _Requirements: 1.1, 1.2, 1.3, 19.1_
 
-  - [ ] 12.2 Create deployment documentation
+  - [x] 12.2 Create deployment documentation
     - Write docs/DEPLOYMENT.md with step-by-step instructions
     - Include prerequisites and system requirements
     - Document installation process
     - Add troubleshooting section
     - _Requirements: 19.2_
 
-  - [ ] 12.3 Create AWS setup documentation
+  - [x] 12.3 Create AWS setup documentation
     - Write docs/AWS_SETUP.md with AWS configuration guide
     - Document S3 bucket setup
     - Document Lambda deployment
@@ -774,32 +774,32 @@ Python 3.9+ (as specified in the design document)
     - Include IAM permissions
     - _Requirements: 19.3_
 
-  - [ ] 12.4 Create database schema documentation
+  - [x] 12.4 Create database schema documentation
     - Write docs/DATABASE_SCHEMA.md
     - Document all tables and relationships
     - Include ER diagram
     - Document indexes and constraints
     - _Requirements: 19.4_
 
-  - [ ] 12.5 Update system architecture documentation
+  - [x] 12.5 Update system architecture documentation
     - Update docs/SYSTEM_ARCHITECTURE.md
     - Reflect new folder structure
     - Document all components and interactions
     - Include data flow diagrams
     - _Requirements: 19.5_
 
-  - [ ] 12.6 Create troubleshooting guide
+  - [x] 12.6 Create troubleshooting guide
     - Write docs/TROUBLESHOOTING.md
     - Document common issues and solutions
     - Include error messages and fixes
     - Add debugging tips
     - _Requirements: 19.6_
 
-  - [ ] 12.7 Write property test for documentation consistency
+  - [x] 12.7 Write property test for documentation consistency
     - **Property 1: Documentation Hardware Specification Consistency**
     - **Validates: Requirements 1.1, 1.3, 1.4**
 
-  - [ ] 12.8 Checkpoint - Verify documentation is complete and accurate
+  - [x] 12.8 Checkpoint - Verify documentation is complete and accurate
     - Review all documentation files
     - Verify hardware specs are consistent (16GB)
     - Verify deployment instructions are clear

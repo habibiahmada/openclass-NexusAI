@@ -443,6 +443,6 @@ python scripts/download_model.py
 
 ---
 
-**Last Updated:** 2025-02-22  
+**Last Updated:** 2026-02-20  
 **Version:** 1.0.0  
 **Maintainer:** Development Team

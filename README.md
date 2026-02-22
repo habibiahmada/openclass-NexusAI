@@ -20,8 +20,9 @@ Akses di: http://localhost:8000
 ## 📋 System Requirements
 
 - Python 3.8+
-- RAM 4GB minimum
-- Disk space 10GB
+- RAM 16GB minimum
+- CPU 8-core minimum
+- Disk space 512GB SSD
 - Windows/Linux/Mac OS
 
 ## 📚 Dokumentasi
@@ -43,7 +44,7 @@ Lihat [docs/README.md](docs/README.md) untuk indeks lengkap dokumentasi.
 - ✅ **Offline-first**: Berjalan tanpa internet
 - ✅ **Multi-role**: Siswa, Guru, Admin
 - ✅ **RAG-powered**: Jawaban berdasarkan materi kurikulum
-- ✅ **Low-spec friendly**: Berjalan di RAM 4GB
+- ✅ **Production-ready**: Optimized for 16GB RAM school servers
 - ✅ **LAN support**: Akses dari multiple komputer
 
 ## 🏗️ Struktur Project
