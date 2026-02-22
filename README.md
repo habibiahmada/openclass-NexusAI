@@ -6,7 +6,7 @@ Sistem AI pembelajaran offline untuk sekolah Indonesia dengan RAG (Retrieval-Aug
 
 ```bash
 # 1. Verifikasi sistem
-python scripts/check_system_ready.py
+python scripts/system/check_system_ready.py
 
 # 2. Jalankan aplikasi
 python api_server.py
@@ -31,12 +31,18 @@ Lihat [docs/README.md](docs/README.md) untuk indeks lengkap dokumentasi.
 
 ### Panduan Cepat
 - [Quick Start](docs/guides/QUICK_START.md) - Mulai dalam 5 menit
-- [User Guide](docs/USER_GUIDE.md) - Panduan lengkap
-- [Deployment](docs/guides/DEPLOYMENT.md) - Deploy ke sekolah
+- [User Guide](docs/user_guide/USER_GUIDE.md) - Panduan lengkap
+- [Deployment](docs/deployment/DEPLOYMENT.md) - Deploy ke sekolah
+
+### Arsitektur & Development
+- [System Architecture](docs/architecture/SYSTEM_ARCHITECTURE.md) - Arsitektur sistem
+- [Deployment Scenarios](docs/architecture/deployment-scenarios.md) - Skenario deployment
+- [Developer Guide](docs/development/DEVELOPER_GUIDE.md) - Panduan development
+- [Development Strategy](docs/development/development-strategy.md) - Strategi pengembangan
 
 ### Teknis
-- [System Architecture](docs/SYSTEM_ARCHITECTURE.md) - Arsitektur
-- [Developer Guide](docs/DEVELOPER_GUIDE.md) - Development
+- [Database Schema](docs/technical/DATABASE_SCHEMA.md) - Skema database
+- [API Structure](docs/technical/API_MODULAR_STRUCTURE.md) - Struktur API
 - [Contributing](CONTRIBUTING.md) - Cara berkontribusi
 
 ## 🎯 Fitur Utama
@@ -76,7 +82,10 @@ pip install -r requirements.txt
 pytest
 
 # Check embeddings
-python scripts/check_embeddings.py
+python scripts/system/check_embeddings.py
+
+# Verify system
+python scripts/system/verify_system.py
 ```
 
 ## 📄 License
