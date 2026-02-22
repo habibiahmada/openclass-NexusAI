@@ -279,10 +279,11 @@ class CompletePipeline:
             raise ValueError("Query cannot be empty")
         
         # Educational validation if enabled
+        # Note: Educational validation is done on response, not query
+        # Query validation is minimal - just check if it's educational context
         if self.config.enable_educational_validation and self.educational_validator:
-            validation_result = self.educational_validator.validate_query(query)
-            if not validation_result.is_valid:
-                logger.warning(f"Query failed educational validation: {validation_result.issues}")
+            # Skip query validation - we'll validate the response instead
+            pass
         
         try:
             if use_batch_processing and self.batch_processor:

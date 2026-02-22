@@ -334,75 +334,75 @@ Python 3.9+ (as specified in the design document)
     - Ensure all tests pass, ask the user if questions arise.
 
 
-- [ ] 6. Phase 6: Pedagogical Intelligence Engine
-  - [ ] 6.1 Implement MasteryTracker class
+- [x] 6. Phase 6: Pedagogical Intelligence Engine
+  - [x] 6.1 Implement MasteryTracker class
     - Create classify_topic() method using keyword matching
     - Implement update_mastery() with scoring algorithm
     - Add get_mastery_level() and get_all_mastery() methods
     - Store mastery data in topic_mastery table
     - _Requirements: 4.1, 4.5_
 
-  - [ ] 6.2 Implement mastery scoring algorithm
+  - [x] 6.2 Implement mastery scoring algorithm
     - Calculate mastery based on question frequency, complexity, retention
     - Ensure mastery level always between 0.0 and 1.0
     - Update mastery after each student question
     - _Requirements: 4.1_
 
-  - [ ] 6.3 Implement WeakAreaDetector class
+  - [x] 6.3 Implement WeakAreaDetector class
     - Create detect_weak_areas() method (threshold < 0.4)
     - Implement get_weakness_score() calculation
     - Add recommend_practice() method
     - Store weak areas in weak_areas table
     - _Requirements: 4.2_
 
-  - [ ] 6.4 Implement AdaptiveQuestionGenerator class
+  - [x] 6.4 Implement AdaptiveQuestionGenerator class
     - Create generate_question() method
     - Implement adjust_difficulty() based on mastery level
     - Add get_practice_set() for multiple questions
     - Store practice questions in practice_questions table
     - _Requirements: 4.3, 4.6_
 
-  - [ ] 6.5 Implement WeeklyReportGenerator class
+  - [x] 6.5 Implement WeeklyReportGenerator class
     - Create generate_report() for individual students
     - Implement get_class_summary() for teachers
     - Add export_report() in PDF/JSON format
     - _Requirements: 4.4_
 
-  - [ ] 6.6 Integrate pedagogical engine with chat pipeline
+  - [x] 6.6 Integrate pedagogical engine with chat pipeline
     - Extract topic from each question
     - Calculate question complexity
     - Update mastery tracker after each query
     - Optionally suggest practice questions
     - _Requirements: 4.5_
 
-  - [ ] 6.7 Write property test for mastery level bounds
+  - [x] 6.7 Write property test for mastery level bounds
     - **Property 5: Mastery Level Bounds**
     - **Validates: Requirements 4.1**
 
-  - [ ] 6.8 Write property test for weak area detection
+  - [x] 6.8 Write property test for weak area detection
     - **Property 6: Weak Area Detection**
     - **Validates: Requirements 4.2**
 
-  - [ ] 6.9 Write property test for adaptive question difficulty
+  - [x] 6.9 Write property test for adaptive question difficulty
     - **Property 7: Adaptive Question Difficulty**
     - **Validates: Requirements 4.6**
 
-  - [ ] 6.10 Write property test for topic classification
+  - [x] 6.10 Write property test for topic classification
     - **Property 8: Topic Classification and Mastery Update**
     - **Validates: Requirements 4.5**
 
-  - [ ] 6.11 Write property test for practice question generation
+  - [x] 6.11 Write property test for practice question generation
     - **Property 9: Adaptive Practice Question Generation**
     - **Validates: Requirements 4.3**
 
-  - [ ] 6.12 Write unit tests for pedagogical engine
+  - [x] 6.12 Write unit tests for pedagogical engine
     - Test mastery calculation with various inputs
     - Test weak area detection logic
     - Test question generation
     - Test report generation
     - _Requirements: 4.1-4.6_
 
-  - [ ] 6.13 Checkpoint - Verify pedagogical engine tracks mastery
+  - [x] 6.13 Checkpoint - Verify pedagogical engine tracks mastery
     - Submit test questions as student
     - Verify mastery levels updated in database
     - Verify weak areas detected correctly

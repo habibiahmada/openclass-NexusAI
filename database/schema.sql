@@ -83,9 +83,10 @@ CREATE TABLE topic_mastery (
     topic VARCHAR(255) NOT NULL,
     mastery_level FLOAT DEFAULT 0.0 CHECK (mastery_level BETWEEN 0.0 AND 1.0),
     question_count INTEGER DEFAULT 0,
-    correct_count INTEGER DEFAULT 0,
-    last_interaction TIMESTAMP,
+    avg_complexity FLOAT DEFAULT 0.0,  -- Average complexity of questions asked
+    last_question_date TIMESTAMP,  -- Last time student asked about this topic
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(user_id, subject_id, topic)  -- One mastery record per user-subject-topic
 );
 
@@ -97,7 +98,7 @@ CREATE TABLE weak_areas (
     subject_id INTEGER REFERENCES subjects(id) ON DELETE CASCADE,
     topic VARCHAR(255) NOT NULL,
     weakness_score FLOAT,  -- Higher score = weaker understanding
-    recommended_practice TEXT,  -- Suggested practice activities
+    recommendation TEXT,  -- Suggested practice activities (renamed from recommended_practice)
     detected_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -108,8 +109,8 @@ CREATE TABLE practice_questions (
     subject_id INTEGER REFERENCES subjects(id) ON DELETE CASCADE,
     topic VARCHAR(255) NOT NULL,
     difficulty VARCHAR(20) CHECK (difficulty IN ('easy', 'medium', 'hard')),
-    question TEXT NOT NULL,
-    answer TEXT NOT NULL,
+    question_text TEXT NOT NULL,  -- Renamed from 'question' to match code
+    answer_hint TEXT NOT NULL,    -- Renamed from 'answer' to match code
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

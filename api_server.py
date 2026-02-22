@@ -46,6 +46,7 @@ try:
     from src.persistence.session_repository import SessionRepository
     from src.persistence.chat_history_repository import ChatHistoryRepository
     from src.persistence.user_repository import UserRepository
+    from src.persistence.subject_repository import SubjectRepository
     DB_AVAILABLE = True
 except ImportError as e:
     logger.warning(f"Database components not available: {e}")
@@ -54,7 +55,18 @@ except ImportError as e:
     SessionRepository = None
     ChatHistoryRepository = None
     UserRepository = None
+    SubjectRepository = None
     DB_AVAILABLE = False
+
+# Import pedagogical engine
+try:
+    from src.pedagogy.integration import create_pedagogical_integration
+    PEDAGOGY_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"Pedagogical engine not available: {e}")
+    logger.warning("Server will run without pedagogical tracking")
+    create_pedagogical_integration = None
+    PEDAGOGY_AVAILABLE = False
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -232,7 +244,12 @@ class AppState:
         self.session_repo = None
         self.chat_history_repo = None
         self.user_repo = None
+        self.subject_repo = None
         self.db_initialized = False
+        
+        # Pedagogical engine
+        self.pedagogical_integration = None
+        self.pedagogy_initialized = False
     
     def initialize_database(self):
         """Initialize database connection and repositories"""
@@ -263,9 +280,21 @@ class AppState:
             self.session_repo = SessionRepository(self.db_manager)
             self.chat_history_repo = ChatHistoryRepository(self.db_manager)
             self.user_repo = UserRepository(self.db_manager)
+            self.subject_repo = SubjectRepository(self.db_manager)
             
             self.db_initialized = True
             logger.info("Database initialized successfully")
+            
+            # Initialize pedagogical engine if available
+            if PEDAGOGY_AVAILABLE:
+                try:
+                    self.pedagogical_integration = create_pedagogical_integration(self.db_manager)
+                    self.pedagogy_initialized = True
+                    logger.info("Pedagogical engine initialized successfully")
+                except Exception as e:
+                    logger.error(f"Failed to initialize pedagogical engine: {e}", exc_info=True)
+                    self.pedagogy_initialized = False
+            
             return True
             
         except Exception as e:
@@ -546,17 +575,58 @@ async def chat(request: ChatRequest, token_data: Dict = Depends(verify_token)):
         # Save to database if available
         if state.db_initialized and state.chat_history_repo:
             try:
-                # Get subject_id if subject filter is specified
-                subject_id = None  # TODO: Map subject_filter to subject_id from database
+                # Get subject_id from subject_filter
+                subject_id = None
+                subject_name = 'informatika'  # Default subject
                 
+                if request.subject_filter and request.subject_filter != "all":
+                    # Try to get subject from database
+                    try:
+                        subjects = state.subject_repo.get_all_subjects()
+                        for subject in subjects:
+                            if subject.name.lower() == request.subject_filter.lower():
+                                subject_id = subject.id
+                                subject_name = subject.name
+                                break
+                    except Exception as e:
+                        logger.warning(f"Failed to get subject from database: {e}")
+                
+                # Save chat to database
+                # Note: QueryResult doesn't have confidence, use 0.0 as default
                 state.chat_history_repo.save_chat(
                     user_id=token_data['user_id'],
                     subject_id=subject_id,
                     question=request.message,
                     response=result.response,
-                    confidence=result.confidence
+                    confidence=0.0  # QueryResult doesn't have confidence attribute
                 )
                 logger.info(f"Chat saved to database for user_id={token_data['user_id']}")
+                
+                # Process with pedagogical engine if available
+                if state.pedagogy_initialized and state.pedagogical_integration:
+                    try:
+                        pedagogical_result = state.pedagogical_integration.process_student_question(
+                            user_id=token_data['user_id'],
+                            subject_id=subject_id or 1,  # Use 1 as default if no subject
+                            question=request.message,
+                            subject_name=subject_name,
+                            suggest_practice=False  # Don't suggest practice by default
+                        )
+                        
+                        if pedagogical_result['success']:
+                            logger.info(
+                                f"Pedagogical tracking updated: "
+                                f"topic={pedagogical_result['topic']}, "
+                                f"mastery={pedagogical_result['mastery_level']:.2f}, "
+                                f"weak_areas={pedagogical_result['weak_areas_count']}"
+                            )
+                        else:
+                            logger.warning(f"Pedagogical tracking failed: {pedagogical_result.get('error')}")
+                    
+                    except Exception as e:
+                        logger.error(f"Failed to process pedagogical tracking: {e}", exc_info=True)
+                        # Continue even if pedagogical tracking fails
+                
             except Exception as e:
                 logger.error(f"Failed to save chat to database: {e}", exc_info=True)
                 logger.warning("Continuing without saving chat history")
@@ -572,11 +642,177 @@ async def chat(request: ChatRequest, token_data: Dict = Depends(verify_token)):
         return ChatResponse(
             response=result.response,
             source=source,
-            confidence=result.confidence
+            confidence=0.0  # QueryResult doesn't have confidence attribute
         )
         
     except Exception as e:
         logger.error(f"Error processing chat: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ===========================
+# Pedagogical Engine Endpoints
+# ===========================
+@app.get("/api/student/progress")
+async def get_student_progress(token_data: Dict = Depends(verify_token)):
+    """
+    Get student progress summary (mastery levels, weak areas)
+    """
+    if not state.pedagogy_initialized or not state.pedagogical_integration:
+        raise HTTPException(
+            status_code=503,
+            detail="Pedagogical engine not available"
+        )
+    
+    try:
+        # Get default subject (informatika kelas 10)
+        subject_id = 1  # Default to first subject
+        
+        # Try to get actual subject from database
+        if state.subject_repo:
+            try:
+                subjects = state.subject_repo.get_subjects_by_grade(10)
+                if subjects:
+                    subject_id = subjects[0].id
+            except Exception as e:
+                logger.warning(f"Failed to get subject: {e}")
+        
+        progress = state.pedagogical_integration.get_student_progress_summary(
+            user_id=token_data['user_id'],
+            subject_id=subject_id
+        )
+        
+        return progress
+    
+    except Exception as e:
+        logger.error(f"Error getting student progress: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/student/weak-areas")
+async def get_weak_areas(token_data: Dict = Depends(verify_token)):
+    """
+    Get student weak areas with recommendations
+    """
+    if not state.pedagogy_initialized or not state.pedagogical_integration:
+        raise HTTPException(
+            status_code=503,
+            detail="Pedagogical engine not available"
+        )
+    
+    try:
+        # Get default subject
+        subject_id = 1
+        
+        if state.subject_repo:
+            try:
+                subjects = state.subject_repo.get_subjects_by_grade(10)
+                if subjects:
+                    subject_id = subjects[0].id
+            except Exception as e:
+                logger.warning(f"Failed to get subject: {e}")
+        
+        weak_areas = state.pedagogical_integration.weak_area_detector.detect_weak_areas(
+            user_id=token_data['user_id'],
+            subject_id=subject_id
+        )
+        
+        return {
+            'success': True,
+            'weak_areas': [
+                {
+                    'topic': wa.topic,
+                    'mastery_level': wa.mastery_level,
+                    'weakness_score': wa.weakness_score,
+                    'recommendation': wa.recommendation,
+                }
+                for wa in weak_areas
+            ]
+        }
+    
+    except Exception as e:
+        logger.error(f"Error getting weak areas: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/student/practice-questions")
+async def get_practice_questions(count: int = 5, token_data: Dict = Depends(verify_token)):
+    """
+    Get adaptive practice questions based on weak areas
+    """
+    if not state.pedagogy_initialized or not state.pedagogical_integration:
+        raise HTTPException(
+            status_code=503,
+            detail="Pedagogical engine not available"
+        )
+    
+    try:
+        # Get default subject
+        subject_id = 1
+        subject_name = 'informatika'
+        
+        if state.subject_repo:
+            try:
+                subjects = state.subject_repo.get_subjects_by_grade(10)
+                if subjects:
+                    subject_id = subjects[0].id
+                    subject_name = subjects[0].name
+            except Exception as e:
+                logger.warning(f"Failed to get subject: {e}")
+        
+        practice_questions = state.pedagogical_integration.question_generator.get_practice_set(
+            user_id=token_data['user_id'],
+            subject_id=subject_id,
+            count=count,
+            subject_name=subject_name
+        )
+        
+        return {
+            'success': True,
+            'questions': [
+                {
+                    'topic': q.topic,
+                    'difficulty': q.difficulty,
+                    'question': q.question_text,
+                    'hint': q.answer_hint,
+                }
+                for q in practice_questions
+            ]
+        }
+    
+    except Exception as e:
+        logger.error(f"Error getting practice questions: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/teacher/student/{student_id}/report")
+async def get_student_report(student_id: int, token_data: Dict = Depends(require_role(['guru', 'admin']))):
+    """
+    Get weekly report for a specific student (teacher/admin only)
+    """
+    if not state.pedagogy_initialized or not state.pedagogical_integration:
+        raise HTTPException(
+            status_code=503,
+            detail="Pedagogical engine not available"
+        )
+    
+    try:
+        # Get default subject
+        subject_id = 1
+        
+        if state.subject_repo:
+            try:
+                subjects = state.subject_repo.get_subjects_by_grade(10)
+                if subjects:
+                    subject_id = subjects[0].id
+            except Exception as e:
+                logger.warning(f"Failed to get subject: {e}")
+        
+        progress = state.pedagogical_integration.get_student_progress_summary(
+            user_id=student_id,
+            subject_id=subject_id
+        )
+        
+        return progress
+    
+    except Exception as e:
+        logger.error(f"Error getting student report: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 # ===========================
