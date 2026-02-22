@@ -127,15 +127,21 @@ class LambdaProcessorPackager:
 
 def create_curriculum_processor_handler() -> str:
     """
-    Create the Lambda handler code for curriculum processing.
+    Create the Lambda handler code for curriculum processing with VKP packaging.
     Returns Python code as string.
+    
+    Requirements: 8.5, 8.6
     """
     return '''
 import json
 import boto3
 import logging
+import os
+import re
+import hashlib
 from pypdf import PdfReader
 from io import BytesIO
+from datetime import datetime
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -149,29 +155,99 @@ BEDROCK_MODEL_ID = os.environ.get('BEDROCK_MODEL_ID', 'amazon.titan-embed-text-v
 OUTPUT_BUCKET = os.environ.get('OUTPUT_BUCKET', 'nexusai-vkp-packages')
 
 
+def extract_metadata_from_filename(filename):
+    """
+    Extract metadata from PDF filename.
+    
+    Expected format: {Subject}_Kelas_{Grade}_Semester_{Semester}_v{Version}.pdf
+    Example: Matematika_Kelas_10_Semester_1_v1.0.0.pdf
+    
+    Returns dict with subject, grade, semester, version
+    """
+    try:
+        # Remove .pdf extension
+        name = filename.replace('.pdf', '')
+        
+        # Try to extract using regex pattern
+        pattern = r'([A-Za-z]+)_Kelas_(\d+)_Semester_(\d+)_v(\d+\.\d+\.\d+)'
+        match = re.match(pattern, name)
+        
+        if match:
+            subject = match.group(1).lower()
+            grade = int(match.group(2))
+            semester = int(match.group(3))
+            version = match.group(4)
+            
+            return {
+                'subject': subject,
+                'grade': grade,
+                'semester': semester,
+                'version': version
+            }
+        else:
+            # Fallback to defaults if pattern doesn't match
+            logger.warning(f"Could not parse filename: {filename}, using defaults")
+            return {
+                'subject': 'unknown',
+                'grade': 10,
+                'semester': 1,
+                'version': '1.0.0'
+            }
+    except Exception as e:
+        logger.error(f"Error extracting metadata from filename: {e}")
+        return {
+            'subject': 'unknown',
+            'grade': 10,
+            'semester': 1,
+            'version': '1.0.0'
+        }
+
+
 def extract_text_from_pdf(pdf_content):
     """Extract text from PDF content"""
     try:
         pdf_file = BytesIO(pdf_content)
         reader = PdfReader(pdf_file)
         text = ""
-        for page in reader.pages:
-            text += page.extract_text()
-        return text
+        page_texts = []
+        
+        for page_num, page in enumerate(reader.pages):
+            page_text = page.extract_text()
+            page_texts.append({
+                'page': page_num + 1,
+                'text': page_text
+            })
+            text += page_text + "\\n\\n"
+        
+        return text, page_texts
     except Exception as e:
         logger.error(f"Failed to extract text from PDF: {e}")
         raise
 
 
-def chunk_text(text, chunk_size=CHUNK_SIZE, overlap=CHUNK_OVERLAP):
-    """Split text into chunks with overlap"""
-    chunks = []
-    words = text.split()
+def chunk_text_with_metadata(page_texts, chunk_size=CHUNK_SIZE, overlap=CHUNK_OVERLAP):
+    """
+    Split text into chunks with overlap and preserve page metadata.
     
-    for i in range(0, len(words), chunk_size - overlap):
-        chunk = ' '.join(words[i:i + chunk_size])
-        if chunk.strip():
-            chunks.append(chunk)
+    Returns list of dicts with chunk_id, text, page info
+    """
+    chunks = []
+    chunk_id = 0
+    
+    for page_info in page_texts:
+        page_num = page_info['page']
+        text = page_info['text']
+        words = text.split()
+        
+        for i in range(0, len(words), chunk_size - overlap):
+            chunk_text = ' '.join(words[i:i + chunk_size])
+            if chunk_text.strip():
+                chunks.append({
+                    'chunk_id': f"chunk_{chunk_id:04d}",
+                    'text': chunk_text,
+                    'page': page_num
+                })
+                chunk_id += 1
     
     return chunks
 
@@ -184,59 +260,125 @@ def generate_embeddings(chunks):
         try:
             response = bedrock_client.invoke_model(
                 modelId=BEDROCK_MODEL_ID,
-                body=json.dumps({"inputText": chunk})
+                body=json.dumps({"inputText": chunk['text']})
             )
             
             result = json.loads(response['body'].read())
             embedding = result.get('embedding', [])
             embeddings.append(embedding)
         except Exception as e:
-            logger.error(f"Failed to generate embedding: {e}")
+            logger.error(f"Failed to generate embedding for chunk {chunk['chunk_id']}: {e}")
             raise
     
     return embeddings
 
 
-def create_vkp_package(chunks, embeddings, metadata):
-    """Create VKP package"""
-    vkp = {
-        "version": metadata.get('version', '1.0.0'),
-        "subject": metadata.get('subject', 'unknown'),
-        "grade": metadata.get('grade', 0),
-        "semester": metadata.get('semester', 1),
-        "created_at": metadata.get('created_at', ''),
-        "embedding_model": BEDROCK_MODEL_ID,
-        "chunk_config": {
-            "chunk_size": CHUNK_SIZE,
-            "chunk_overlap": CHUNK_OVERLAP
-        },
-        "chunks": [
-            {
-                "chunk_id": f"chunk_{i}",
-                "text": chunk,
-                "embedding": embedding,
-                "metadata": {
-                    "page": i,
-                    "section": metadata.get('section', 'general')
-                }
+def calculate_vkp_checksum(vkp_dict):
+    """
+    Calculate SHA256 checksum for VKP integrity verification.
+    
+    Checksum is calculated from JSON with sorted keys, excluding checksum field.
+    """
+    # Remove checksum field if present
+    vkp_copy = vkp_dict.copy()
+    vkp_copy.pop('checksum', None)
+    
+    # Serialize with sorted keys
+    vkp_json = json.dumps(vkp_copy, sort_keys=True, ensure_ascii=False)
+    
+    # Calculate SHA256
+    hash_obj = hashlib.sha256(vkp_json.encode('utf-8'))
+    checksum = f"sha256:{hash_obj.hexdigest()}"
+    
+    return checksum
+
+
+def create_vkp_package(chunks, embeddings, metadata, filename):
+    """
+    Create VKP package with proper structure and checksum.
+    
+    Requirements: 6.1, 6.2, 6.4, 6.5
+    """
+    # Build chunks with embeddings
+    vkp_chunks = []
+    for chunk, embedding in zip(chunks, embeddings):
+        vkp_chunks.append({
+            'chunk_id': chunk['chunk_id'],
+            'text': chunk['text'],
+            'embedding': embedding,
+            'metadata': {
+                'page': chunk['page'],
+                'section': metadata.get('section', 'general'),
+                'topic': metadata.get('topic', 'general')
             }
-            for i, (chunk, embedding) in enumerate(zip(chunks, embeddings))
-        ],
-        "total_chunks": len(chunks),
-        "source_files": metadata.get('source_files', [])
+        })
+    
+    # Create VKP structure
+    vkp = {
+        'version': metadata['version'],
+        'subject': metadata['subject'],
+        'grade': metadata['grade'],
+        'semester': metadata['semester'],
+        'created_at': datetime.utcnow().isoformat() + 'Z',
+        'embedding_model': BEDROCK_MODEL_ID,
+        'chunk_config': {
+            'chunk_size': CHUNK_SIZE,
+            'chunk_overlap': CHUNK_OVERLAP
+        },
+        'chunks': vkp_chunks,
+        'total_chunks': len(vkp_chunks),
+        'source_files': [filename],
+        'checksum': ''  # Will be calculated
     }
     
-    # Calculate checksum
-    import hashlib
-    vkp_json = json.dumps(vkp, sort_keys=True)
-    checksum = hashlib.sha256(vkp_json.encode()).hexdigest()
-    vkp['checksum'] = f"sha256:{checksum}"
+    # Calculate and set checksum
+    vkp['checksum'] = calculate_vkp_checksum(vkp)
     
     return vkp
 
 
+def upload_vkp_to_s3(vkp, output_bucket):
+    """
+    Upload VKP to S3 with proper key structure and metadata tags.
+    
+    S3 key format: {subject}/kelas_{grade}/v{version}.vkp
+    Requirements: 8.6
+    """
+    # Generate S3 key
+    s3_key = f"{vkp['subject']}/kelas_{vkp['grade']}/v{vkp['version']}.vkp"
+    
+    # Serialize VKP
+    vkp_json = json.dumps(vkp, indent=2, ensure_ascii=False)
+    
+    # Upload with metadata tags
+    s3_client.put_object(
+        Bucket=output_bucket,
+        Key=s3_key,
+        Body=vkp_json.encode('utf-8'),
+        ContentType='application/json',
+        Metadata={
+            'version': vkp['version'],
+            'subject': vkp['subject'],
+            'grade': str(vkp['grade']),
+            'semester': str(vkp['semester']),
+            'total_chunks': str(vkp['total_chunks']),
+            'checksum': vkp['checksum']
+        }
+    )
+    
+    logger.info(f"Uploaded VKP to s3://{output_bucket}/{s3_key}")
+    return s3_key
+
+
 def lambda_handler(event, context):
-    """Lambda handler for curriculum processing"""
+    """
+    Lambda handler for curriculum processing with VKP packaging.
+    
+    Triggered by S3 upload event, processes PDF, generates embeddings,
+    and creates VKP package.
+    
+    Requirements: 8.1-8.7
+    """
     try:
         logger.info(f"Received event: {json.dumps(event)}")
         
@@ -246,56 +388,52 @@ def lambda_handler(event, context):
         
         logger.info(f"Processing PDF: s3://{bucket}/{key}")
         
+        # Extract filename
+        filename = key.split('/')[-1]
+        
+        # Extract metadata from filename
+        metadata = extract_metadata_from_filename(filename)
+        logger.info(f"Extracted metadata: {metadata}")
+        
         # Download PDF from S3
         response = s3_client.get_object(Bucket=bucket, Key=key)
         pdf_content = response['Body'].read()
+        logger.info(f"Downloaded PDF ({len(pdf_content)} bytes)")
         
-        # Extract text
-        text = extract_text_from_pdf(pdf_content)
-        logger.info(f"Extracted {len(text)} characters from PDF")
+        # Extract text with page information
+        full_text, page_texts = extract_text_from_pdf(pdf_content)
+        logger.info(f"Extracted {len(full_text)} characters from {len(page_texts)} pages")
         
-        # Chunk text
-        chunks = chunk_text(text)
+        # Chunk text with metadata
+        chunks = chunk_text_with_metadata(page_texts)
         logger.info(f"Created {len(chunks)} chunks")
         
         # Generate embeddings
         embeddings = generate_embeddings(chunks)
         logger.info(f"Generated {len(embeddings)} embeddings")
         
-        # Extract metadata from filename
-        filename = key.split('/')[-1]
-        metadata = {
-            'source_files': [filename],
-            'subject': 'curriculum',
-            'grade': 11,
-            'semester': 1,
-            'section': 'general'
-        }
-        
         # Create VKP package
-        vkp = create_vkp_package(chunks, embeddings, metadata)
+        vkp = create_vkp_package(chunks, embeddings, metadata, filename)
+        logger.info(f"Created VKP package v{vkp['version']} with checksum {vkp['checksum']}")
         
-        # Upload VKP to output bucket
-        output_key = f"vkp/{filename.replace('.pdf', '.json')}"
-        s3_client.put_object(
-            Bucket=OUTPUT_BUCKET,
-            Key=output_key,
-            Body=json.dumps(vkp),
-            ContentType='application/json'
-        )
-        
-        logger.info(f"Uploaded VKP to s3://{OUTPUT_BUCKET}/{output_key}")
+        # Upload VKP to S3
+        s3_key = upload_vkp_to_s3(vkp, OUTPUT_BUCKET)
         
         return {
             'statusCode': 200,
             'body': json.dumps({
                 'message': 'PDF processed successfully',
-                'vkp_location': f"s3://{OUTPUT_BUCKET}/{output_key}",
-                'chunks_count': len(chunks)
+                'vkp_location': f"s3://{OUTPUT_BUCKET}/{s3_key}",
+                'version': vkp['version'],
+                'subject': vkp['subject'],
+                'grade': vkp['grade'],
+                'semester': vkp['semester'],
+                'chunks_count': vkp['total_chunks'],
+                'checksum': vkp['checksum']
             })
         }
     except Exception as e:
-        logger.error(f"Error processing PDF: {e}")
+        logger.error(f"Error processing PDF: {e}", exc_info=True)
         return {
             'statusCode': 500,
             'body': json.dumps({'error': str(e)})
