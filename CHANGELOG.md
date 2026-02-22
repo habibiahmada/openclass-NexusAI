@@ -2,6 +2,65 @@
 
 All notable changes to OpenClass Nexus AI will be documented in this file.
 
+## [1.1.0] - 2026-02-22
+
+### 🔄 Major Refactoring: Modular API Structure
+
+#### Added
+- **Modular API Structure**: Refactored monolithic `api_server.py` (1000+ lines) into clean modular structure
+  - `src/api/config.py` - Centralized configuration management
+  - `src/api/models.py` - Pydantic data models
+  - `src/api/auth.py` - Authentication service
+  - `src/api/state.py` - Application state management
+  - `src/api/routers/` - Organized endpoint routers by domain
+    - `auth_router.py` - Authentication endpoints
+    - `chat_router.py` - Student chat interactions
+    - `teacher_router.py` - Teacher dashboard & reports
+    - `admin_router.py` - Admin panel & system management
+    - `pedagogy_router.py` - Student progress & practice
+    - `queue_router.py` - Concurrency queue statistics
+    - `pages_router.py` - HTML page serving
+
+- **Environment Variable Configuration**: All sensitive data moved to `.env`
+  - `API_HOST`, `API_PORT` - Server configuration
+  - `SECRET_KEY` - Token signing key (no more hardcoded secrets!)
+  - `TOKEN_EXPIRY_HOURS` - Session expiration
+  - `MAX_CONCURRENT_REQUESTS` - Concurrency limits
+  - `MAX_QUEUE_SIZE` - Queue capacity
+  - `MEMORY_LIMIT_MB` - Memory constraints
+
+- **Migration Tools**:
+  - `scripts/migrate_to_modular_api.py` - Automatic migration script
+  - Automatic backup of old `api_server.py`
+  - Structure verification
+
+- **Documentation**:
+  - `docs/API_MODULAR_STRUCTURE.md` - Complete modular structure documentation
+  - `docs/MODULAR_REFACTORING_GUIDE.md` - Migration and usage guide
+
+#### Changed
+- **api_server.py**: Reduced from 1000+ lines to ~150 lines (clean entry point)
+- **Security**: All secrets moved to environment variables (AWS keys, database credentials, etc.)
+- **Configuration**: Centralized in `config.py` with validation
+- **Authentication**: Extracted to reusable `AuthService` class
+- **State Management**: Centralized in `AppState` class
+
+#### Improved
+- **Maintainability**: Each module < 300 lines, single responsibility principle
+- **Testability**: Independent modules can be unit tested
+- **Scalability**: Easy to add new routers and features
+- **Readability**: Clear separation of concerns, self-documenting structure
+- **Security**: No hardcoded credentials anywhere in code
+- **Reusability**: Shared services and models across routers
+
+#### Technical Details
+- ✅ **Backward Compatible**: No breaking changes
+- ✅ **Automatic Migration**: Via migration script
+- ✅ **All Tests Pass**: Imports verified, syntax checked
+- ✅ **Production Ready**: Best practices applied
+
+---
+
 ## [Unreleased]
 
 ### Changed
