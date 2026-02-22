@@ -476,69 +476,69 @@ Python 3.9+ (as specified in the design document)
     - Ensure all tests pass, ask the user if questions arise.
 
 
-- [ ] 8. Phase 8: Aggregated Telemetry System
-  - [ ] 8.1 Implement TelemetryCollector class
+- [x] 8. Phase 8: Aggregated Telemetry System
+  - [x] 8.1 Implement TelemetryCollector class
     - Create record_query() method for query metrics
     - Implement record_error() for error tracking
     - Add get_metrics_snapshot() for current metrics
     - Store metrics in memory for aggregation
     - _Requirements: 9.1_
 
-  - [ ] 8.2 Implement MetricsAggregator class
+  - [x] 8.2 Implement MetricsAggregator class
     - Create aggregate_hourly() method
     - Calculate percentiles (p50, p90, p99) for latency
     - Aggregate error types and counts
     - Get storage usage metrics
     - _Requirements: 9.1_
 
-  - [ ] 8.3 Implement PIIVerifier class
+  - [x] 8.3 Implement PIIVerifier class
     - Create verify_no_pii() method with pattern matching
     - Scan for NIK, email, phone, name patterns
     - Check for suspicious keys (username, email, etc.)
     - Reject telemetry if PII detected
     - _Requirements: 9.2, 9.5_
 
-  - [ ] 8.4 Implement school ID anonymization
+  - [x] 8.4 Implement school ID anonymization
     - Create anonymize_school_id() using SHA256 hash
     - Use salt from environment variable
     - Ensure one-way hashing (cannot reverse)
     - _Requirements: 9.4_
 
-  - [ ] 8.5 Implement TelemetryUploader class
+  - [x] 8.5 Implement TelemetryUploader class
     - Create upload_metrics() to DynamoDB
     - Implement queue_offline_metrics() for offline mode
     - Add retry_failed_uploads() with exponential backoff
     - _Requirements: 9.3_
 
-  - [ ] 8.6 Create hourly telemetry upload cron job
+  - [x] 8.6 Create hourly telemetry upload cron job
     - Aggregate metrics every hour
     - Verify no PII before upload
     - Upload to DynamoDB if online
     - Queue locally if offline
     - _Requirements: 9.3_
 
-  - [ ] 8.7 Integrate telemetry collection with API endpoints
+  - [x] 8.7 Integrate telemetry collection with API endpoints
     - Record query metrics after each request
     - Record error metrics on failures
     - Track latency and success rate
     - _Requirements: 9.1_
 
-  - [ ] 8.8 Write property test for telemetry anonymization
+  - [x] 8.8 Write property test for telemetry anonymization
     - **Property 23: Telemetry Data Anonymization**
     - **Validates: Requirements 9.1, 9.2, 9.4, 9.5**
 
-  - [ ] 8.9 Write property test for AWS data transmission privacy
+  - [x] 8.9 Write property test for AWS data transmission privacy
     - **Property 33: AWS Data Transmission Privacy**
     - **Validates: Requirements 16.4, 16.5, 16.6, 16.7**
 
-  - [ ] 8.10 Write unit tests for telemetry system
+  - [x] 8.10 Write unit tests for telemetry system
     - Test metrics collection and aggregation
     - Test PII verification
     - Test anonymization
     - Test upload and offline queuing
     - _Requirements: 9.1-9.5_
 
-  - [ ] 8.11 Checkpoint - Verify telemetry contains no PII
+  - [x] 8.11 Checkpoint - Verify telemetry contains no PII
     - Generate test telemetry data
     - Run PII verification
     - Upload to DynamoDB

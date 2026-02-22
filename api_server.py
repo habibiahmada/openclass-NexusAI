@@ -83,6 +83,16 @@ except ImportError as e:
     TokenStreamer = None
     CONCURRENCY_AVAILABLE = False
 
+# Import telemetry components
+try:
+    from src.telemetry.collector import get_collector
+    TELEMETRY_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"Telemetry components not available: {e}")
+    logger.warning("Server will run without telemetry collection")
+    get_collector = None
+    TELEMETRY_AVAILABLE = False
+
 # Initialize FastAPI app
 app = FastAPI(
     title="OpenClass Nexus AI API",
@@ -581,6 +591,9 @@ async def chat(request: ChatRequest, token_data: Dict = Depends(verify_token)):
     This endpoint uses the ConcurrencyManager to limit concurrent inference threads
     and queue additional requests when capacity is exceeded.
     """
+    start_time = datetime.now()  # Track latency for telemetry
+    success = False
+    
     if not state.is_initialized:
         # Demo mode response with helpful instructions
         logger.warning("RAG not initialized - returning demo response")
@@ -731,6 +744,16 @@ async def chat(request: ChatRequest, token_data: Dict = Depends(verify_token)):
         if result.sources:
             source = ", ".join([s.get("title", "Unknown") for s in result.sources[:2]])
         
+        # Record successful query telemetry
+        success = True
+        latency = (datetime.now() - start_time).total_seconds() * 1000  # Convert to ms
+        if TELEMETRY_AVAILABLE:
+            try:
+                collector = get_collector()
+                collector.record_query(latency=latency, success=True)
+            except Exception as e:
+                logger.error(f"Failed to record telemetry: {e}")
+        
         return ChatResponse(
             response=result.response,
             source=source,
@@ -738,13 +761,41 @@ async def chat(request: ChatRequest, token_data: Dict = Depends(verify_token)):
         )
         
     except asyncio.QueueFull:
+        # Record error telemetry
+        if TELEMETRY_AVAILABLE:
+            try:
+                collector = get_collector()
+                latency = (datetime.now() - start_time).total_seconds() * 1000
+                collector.record_query(latency=latency, success=False)
+                collector.record_error(error_type="queue_full", error_message="Request queue is full")
+            except Exception as e:
+                logger.error(f"Failed to record telemetry: {e}")
+        
         raise HTTPException(
             status_code=503,
             detail="Server sedang penuh. Silakan coba lagi nanti."
         )
     except HTTPException:
+        # Record error telemetry for HTTP exceptions
+        if TELEMETRY_AVAILABLE and not success:
+            try:
+                collector = get_collector()
+                latency = (datetime.now() - start_time).total_seconds() * 1000
+                collector.record_query(latency=latency, success=False)
+            except Exception as e:
+                logger.error(f"Failed to record telemetry: {e}")
         raise
     except Exception as e:
+        # Record error telemetry
+        if TELEMETRY_AVAILABLE:
+            try:
+                collector = get_collector()
+                latency = (datetime.now() - start_time).total_seconds() * 1000
+                collector.record_query(latency=latency, success=False)
+                collector.record_error(error_type="processing_error", error_message=str(e)[:200])
+            except Exception as te:
+                logger.error(f"Failed to record telemetry: {te}")
+        
         logger.error(f"Error processing chat: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -754,6 +805,9 @@ async def _process_chat_without_queue(request: ChatRequest, token_data: Dict):
     Fallback function to process chat without concurrency management.
     Used when ConcurrencyManager is not available.
     """
+    start_time = datetime.now()
+    success = False
+    
     try:
         logger.info(f"Received question from user {token_data['username']}: {request.message[:50]}...")
         
@@ -815,6 +869,16 @@ async def _process_chat_without_queue(request: ChatRequest, token_data: Dict):
         if result.sources:
             source = ", ".join([s.get("title", "Unknown") for s in result.sources[:2]])
         
+        # Record successful query telemetry
+        success = True
+        latency = (datetime.now() - start_time).total_seconds() * 1000
+        if TELEMETRY_AVAILABLE:
+            try:
+                collector = get_collector()
+                collector.record_query(latency=latency, success=True)
+            except Exception as e:
+                logger.error(f"Failed to record telemetry: {e}")
+        
         return ChatResponse(
             response=result.response,
             source=source,
@@ -822,6 +886,16 @@ async def _process_chat_without_queue(request: ChatRequest, token_data: Dict):
         )
         
     except Exception as e:
+        # Record error telemetry
+        if TELEMETRY_AVAILABLE:
+            try:
+                collector = get_collector()
+                latency = (datetime.now() - start_time).total_seconds() * 1000
+                collector.record_query(latency=latency, success=False)
+                collector.record_error(error_type="processing_error", error_message=str(e)[:200])
+            except Exception as te:
+                logger.error(f"Failed to record telemetry: {te}")
+        
         logger.error(f"Error processing chat: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
