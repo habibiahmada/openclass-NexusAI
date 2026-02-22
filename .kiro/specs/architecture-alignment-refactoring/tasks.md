@@ -146,61 +146,61 @@ Python 3.9+ (as specified in the design document)
     - Ensure all tests pass, ask the user if questions arise.
 
 
-- [ ] 3. Phase 3: AWS Infrastructure Setup
-  - [ ] 3.1 Create AWS infrastructure setup script
+- [x] 3. Phase 3: AWS Infrastructure Setup
+  - [x] 3.1 Create AWS infrastructure setup script
     - Write Python script using boto3
     - Make script idempotent (can run multiple times safely)
     - Add error handling and logging
     - _Requirements: 15.1-15.7_
 
-  - [ ] 3.2 Create S3 buckets
+  - [x] 3.2 Create S3 buckets
     - Create nexusai-curriculum-raw bucket
     - Create nexusai-vkp-packages bucket with versioning enabled
     - Create nexusai-model-distribution bucket
     - Configure bucket policies and CORS
     - _Requirements: 15.1, 15.2_
 
-  - [ ] 3.3 Create DynamoDB tables
+  - [x] 3.3 Create DynamoDB tables
     - Create nexusai-schools table (school_id as hash key)
     - Create nexusai-metrics table (school_id as hash, timestamp as range)
     - Configure TTL for metrics table (90 days)
     - _Requirements: 15.3_
 
-  - [ ] 3.4 Deploy Lambda curriculum processor function
+  - [x] 3.4 Deploy Lambda curriculum processor function
     - Package Lambda function with dependencies (pypdf, boto3)
     - Configure runtime (Python 3.11, 1GB RAM, 5 min timeout)
     - Set environment variables (BEDROCK_MODEL_ID, CHUNK_SIZE, etc.)
     - _Requirements: 15.5_
 
-  - [ ] 3.5 Configure S3 event trigger for Lambda
+  - [x] 3.5 Configure S3 event trigger for Lambda
     - Add S3 event notification for .pdf uploads
     - Configure filter (prefix: raw/, suffix: .pdf)
     - Test trigger with sample PDF
     - _Requirements: 15.6_
 
-  - [ ] 3.6 Setup IAM roles and permissions
+  - [x] 3.6 Setup IAM roles and permissions
     - Create Lambda execution role with S3 and Bedrock permissions
     - Create school server role for S3 read access
     - Configure least-privilege access policies
     - _Requirements: 15.5_
 
-  - [ ] 3.7 Configure CloudFront distribution (optional)
+  - [x] 3.7 Configure CloudFront distribution (optional)
     - Create CloudFront distribution for VKP delivery
     - Configure origin as S3 VKP bucket
     - Setup signed URLs for access control
     - _Requirements: 15.4_
 
-  - [ ] 3.8 Write property test for AWS infrastructure idempotence
+  - [x] 3.8 Write property test for AWS infrastructure idempotence
     - **Property 31: AWS Infrastructure Setup Idempotence**
     - **Validates: Requirements 15.7**
 
-  - [ ] 3.9 Write unit tests for infrastructure setup
+  - [x] 3.9 Write unit tests for infrastructure setup
     - Test S3 bucket creation
     - Test DynamoDB table creation
     - Test Lambda deployment
     - _Requirements: 15.1-15.7_
 
-  - [ ] 3.10 Checkpoint - Verify AWS infrastructure is operational
+  - [x] 3.10 Checkpoint - Verify AWS infrastructure is operational
     - Upload test PDF to S3
     - Verify Lambda triggers and processes PDF
     - Check VKP package created in output bucket
