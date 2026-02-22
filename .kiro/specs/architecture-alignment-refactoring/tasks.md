@@ -624,55 +624,55 @@ Python 3.9+ (as specified in the design document)
     - Ensure all tests pass, ask the user if questions arise.
 
 
-- [ ] 10. Phase 10: Embedding Strategy Manager
-  - [ ] 10.1 Implement EmbeddingStrategy abstract base class
+- [x] 10. Phase 10: Embedding Strategy Manager
+  - [x] 10.1 Implement EmbeddingStrategy abstract base class
     - Define generate_embedding() abstract method
     - Add batch_generate() abstract method
     - Create get_dimension() abstract method
     - Add health_check() abstract method
     - _Requirements: 11.1_
 
-  - [ ] 10.2 Implement BedrockEmbeddingStrategy class
+  - [x] 10.2 Implement BedrockEmbeddingStrategy class
     - Create AWS Bedrock client integration
     - Implement embedding generation using Titan model
     - Add batch processing support
     - Handle API errors and throttling
     - _Requirements: 11.2_
 
-  - [ ] 10.3 Implement LocalMiniLMEmbeddingStrategy class
+  - [x] 10.3 Implement LocalMiniLMEmbeddingStrategy class
     - Integrate sentence-transformers library
     - Load quantized MiniLM model
     - Implement local embedding generation
     - Optimize for CPU inference
     - _Requirements: 11.3_
 
-  - [ ] 10.4 Implement EmbeddingStrategyManager class
+  - [x] 10.4 Implement EmbeddingStrategyManager class
     - Create get_strategy() method
     - Implement set_strategy() for configuration
     - Add fallback_to_local() for AWS unavailability
     - Load strategy from configuration file
     - _Requirements: 11.1, 11.4, 11.5_
 
-  - [ ] 10.5 Update RAG pipeline to use strategy manager
+  - [x] 10.5 Update RAG pipeline to use strategy manager
     - Replace direct Bedrock calls with strategy manager
     - Add fallback logic for AWS failures
     - Log active embedding strategy
     - _Requirements: 11.4, 11.6_
 
-  - [ ] 10.6 Add configuration for embedding strategy
+  - [x] 10.6 Add configuration for embedding strategy
     - Create config parameter for default strategy
     - Add sovereign mode flag
     - Allow runtime strategy switching
     - _Requirements: 11.5_
 
-  - [ ] 10.7 Write unit tests for embedding strategies
+  - [x] 10.7 Write unit tests for embedding strategies
     - Test Bedrock strategy
     - Test local MiniLM strategy
     - Test strategy manager
     - Test fallback behavior
     - _Requirements: 11.1-11.6_
 
-  - [ ] 10.8 Checkpoint - Verify embedding strategy switching works
+  - [x] 10.8 Checkpoint - Verify embedding strategy switching works
     - Test with Bedrock strategy
     - Switch to local strategy
     - Verify embeddings generated correctly

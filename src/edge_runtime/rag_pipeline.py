@@ -92,6 +92,7 @@ class RAGPipeline:
         vector_db: ChromaDBManager,
         inference_engine: InferenceEngine,
         embeddings_client: Optional[BedrockEmbeddingsClient] = None,
+        embedding_strategy_manager: Optional['EmbeddingStrategyManager'] = None,
         context_manager: Optional[ContextManager] = None,
         degradation_manager: Optional[GracefulDegradationManager] = None
     ):
@@ -101,13 +102,18 @@ class RAGPipeline:
         Args:
             vector_db: ChromaDB manager for document retrieval
             inference_engine: Local inference engine for response generation
-            embeddings_client: Client for generating query embeddings (optional)
+            embeddings_client: Client for generating query embeddings (optional, deprecated)
+            embedding_strategy_manager: Strategy manager for configurable embeddings (optional)
             context_manager: Context manager for token optimization (optional)
             degradation_manager: Graceful degradation manager for performance optimization (optional)
         """
         self.vector_db = vector_db
         self.inference_engine = inference_engine
+        
+        # Support both old embeddings_client and new strategy manager
         self.embeddings_client = embeddings_client
+        self.embedding_strategy_manager = embedding_strategy_manager
+        
         self.context_manager = context_manager or ContextManager()
         self.degradation_manager = degradation_manager
         self.prompt_template = EducationalPromptTemplate()
@@ -123,6 +129,15 @@ class RAGPipeline:
         except ValueError:
             logger.warning("ChromaDB collection not found, creating new collection")
             self.vector_db.create_collection()
+        
+        # Log active embedding strategy
+        if self.embedding_strategy_manager:
+            strategy_name = self.embedding_strategy_manager.get_current_strategy_name()
+            logger.info(f"RAGPipeline initialized with embedding strategy: {strategy_name}")
+        elif self.embeddings_client:
+            logger.info("RAGPipeline initialized with legacy embeddings client")
+        else:
+            logger.warning("RAGPipeline initialized without embeddings support")
         
         logger.info("Initialized RAGPipeline with all components")
     
@@ -251,8 +266,32 @@ class RAGPipeline:
             Tuple of (formatted_context, selected_documents)
         """
         try:
-            # Generate query embedding if embeddings client is available
-            if self.embeddings_client:
+            # Generate query embedding using strategy manager or legacy client
+            if self.embedding_strategy_manager:
+                try:
+                    # Get current strategy with health check and fallback
+                    strategy = self.embedding_strategy_manager.get_strategy()
+                    strategy_name = self.embedding_strategy_manager.get_current_strategy_name()
+                    logger.debug(f"Using embedding strategy: {strategy_name}")
+                    
+                    query_embedding = strategy.generate_embedding(query)
+                    
+                except Exception as e:
+                    logger.error(f"Embedding strategy failed: {e}")
+                    # Attempt fallback to local if enabled
+                    if self.embedding_strategy_manager.fallback_enabled:
+                        logger.info("Attempting fallback to local embedding strategy")
+                        if self.embedding_strategy_manager.fallback_to_local():
+                            strategy = self.embedding_strategy_manager.get_strategy()
+                            query_embedding = strategy.generate_embedding(query)
+                            logger.info("Successfully generated embedding using fallback strategy")
+                        else:
+                            raise Exception("Fallback to local strategy failed") from e
+                    else:
+                        raise
+                        
+            elif self.embeddings_client:
+                # Legacy path: use old embeddings client
                 query_embedding = self.embeddings_client.generate_embedding(query)
             else:
                 # Fallback: use a dummy embedding or raise error
