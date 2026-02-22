@@ -38,6 +38,10 @@ class AppState:
         # Telemetry
         self.telemetry_collector = None
         self.telemetry_initialized = False
+        
+        # Resilience
+        self.resilience_service = None
+        self.resilience_initialized = False
     
     def initialize_database(self) -> bool:
         """Initialize database connection and repositories"""
@@ -141,6 +145,25 @@ class AppState:
             logger.error(f"Failed to initialize telemetry: {e}", exc_info=True)
             return False
     
+    def initialize_resilience(self) -> bool:
+        """Initialize resilience service"""
+        try:
+            from src.api.resilience_integration import ResilienceService
+            
+            logger.info("Initializing resilience service...")
+            self.resilience_service = ResilienceService()
+            self.resilience_service.initialize()
+            self.resilience_initialized = True
+            logger.info("Resilience service initialized successfully")
+            return True
+            
+        except ImportError:
+            logger.warning("Resilience components not available")
+            return False
+        except Exception as e:
+            logger.error(f"Failed to initialize resilience service: {e}", exc_info=True)
+            return False
+    
     def initialize_pipeline(self) -> bool:
         """Initialize RAG pipeline"""
         try:
@@ -196,6 +219,9 @@ class AppState:
         # Initialize telemetry
         self.initialize_telemetry()
         
+        # Initialize resilience service
+        self.initialize_resilience()
+        
         # Initialize RAG pipeline
         self.initialize_pipeline()
         
@@ -203,6 +229,7 @@ class AppState:
         logger.info(f"Database: {'✓' if self.db_initialized else '✗'}")
         logger.info(f"Concurrency: {'✓' if self.concurrency_initialized else '✗'}")
         logger.info(f"Telemetry: {'✓' if self.telemetry_initialized else '✗'}")
+        logger.info(f"Resilience: {'✓' if self.resilience_initialized else '✗'}")
         logger.info(f"Pipeline: {'✓' if self.is_initialized else '✗'}")
     
     def shutdown(self):
@@ -215,6 +242,13 @@ class AppState:
                 logger.info("Concurrency manager stopped")
             except Exception as e:
                 logger.error(f"Error stopping concurrency manager: {e}")
+        
+        if self.resilience_service:
+            try:
+                self.resilience_service.shutdown()
+                logger.info("Resilience service stopped")
+            except Exception as e:
+                logger.error(f"Error stopping resilience service: {e}")
         
         if self.pipeline:
             try:

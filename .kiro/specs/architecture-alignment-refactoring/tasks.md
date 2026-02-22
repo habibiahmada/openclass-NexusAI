@@ -546,8 +546,8 @@ Python 3.9+ (as specified in the design document)
     - Ensure all tests pass, ask the user if questions arise.
 
 
-- [ ] 9. Phase 9: Resilience and Recovery Module
-  - [ ] 9.1 Implement BackupManager class
+- [x] 9. Phase 9: Resilience and Recovery Module
+  - [x] 9.1 Implement BackupManager class
     - Create create_full_backup() method (PostgreSQL + ChromaDB + config)
     - Implement create_incremental_backup() for daily backups
     - Add restore_backup() with verification
@@ -555,13 +555,13 @@ Python 3.9+ (as specified in the design document)
     - Add optional encrypt_backup() method
     - _Requirements: 10.1, 10.2, 10.3_
 
-  - [ ] 9.2 Implement BackupScheduler class
+  - [x] 9.2 Implement BackupScheduler class
     - Create schedule_weekly_full_backup() cron job (Sunday 2 AM)
     - Implement schedule_daily_incremental_backup() (Monday-Saturday 2 AM)
     - Add cleanup_old_backups() with 28-day retention
     - _Requirements: 10.1, 10.2, 10.7_
 
-  - [ ] 9.3 Implement HealthMonitor class
+  - [x] 9.3 Implement HealthMonitor class
     - Create check_llm_status() method
     - Implement check_chromadb_connection()
     - Add check_postgres_connection()
@@ -570,53 +570,53 @@ Python 3.9+ (as specified in the design document)
     - Add run_health_checks() to execute all checks
     - _Requirements: 10.5_
 
-  - [ ] 9.4 Implement AutoRestartService class
+  - [x] 9.4 Implement AutoRestartService class
     - Create detect_failure() method
     - Implement attempt_restart() with max 3 attempts
     - Add restart cooldown (5 minutes)
     - Create escalate_failure() for manual intervention
     - _Requirements: 10.6_
 
-  - [ ] 9.5 Implement VersionManager class
+  - [x] 9.5 Implement VersionManager class
     - Create get_current_version() method
     - Implement rollback_to_version() with verification
     - Add create_version_snapshot()
     - Store version metadata in PostgreSQL
     - _Requirements: 10.4_
 
-  - [ ] 9.6 Create health monitoring daemon
+  - [x] 9.6 Create health monitoring daemon
     - Run health checks every 5 minutes
     - Attempt auto-restart on critical failures
     - Log all health check results
     - Send alerts on repeated failures
     - _Requirements: 10.5, 10.6_
 
-  - [ ] 9.7 Setup systemd services for auto-start
+  - [x] 9.7 Setup systemd services for auto-start
     - Create nexusai-api.service
     - Create nexusai-health-monitor.service
     - Configure auto-restart on failure
     - _Requirements: 10.6_
 
-  - [ ] 9.8 Write property test for backup compression
+  - [x] 9.8 Write property test for backup compression
     - **Property 24: Backup Compression**
     - **Validates: Requirements 10.3**
 
-  - [ ] 9.9 Write property test for version rollback
+  - [x] 9.9 Write property test for version rollback
     - **Property 25: Version Rollback Round-Trip**
     - **Validates: Requirements 10.4**
 
-  - [ ] 9.10 Write property test for backup retention
+  - [x] 9.10 Write property test for backup retention
     - **Property 26: Backup Retention Policy**
     - **Validates: Requirements 10.7**
 
-  - [ ] 9.11 Write unit tests for resilience module
+  - [x] 9.11 Write unit tests for resilience module
     - Test backup creation and restoration
     - Test health checks
     - Test auto-restart logic
     - Test version rollback
     - _Requirements: 10.1-10.7_
 
-  - [ ] 9.12 Checkpoint - Verify backup and recovery works
+  - [x] 9.12 Checkpoint - Verify backup and recovery works
     - Create full backup
     - Make changes to system
     - Restore from backup

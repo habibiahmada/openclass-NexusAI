@@ -109,15 +109,38 @@ async def shutdown_event():
 @app.get("/api/health")
 async def health_check():
     """Health check endpoint"""
-    return {
+    health_status = {
         "status": "healthy",
         "initialized": app_state.is_initialized,
         "database": app_state.db_initialized,
         "concurrency": app_state.concurrency_initialized,
         "pedagogy": app_state.pedagogy_initialized,
         "telemetry": app_state.telemetry_initialized,
+        "resilience": app_state.resilience_initialized,
         "version": "1.0.0"
     }
+    
+    # Add detailed health checks if resilience service is available
+    if app_state.resilience_initialized and app_state.resilience_service:
+        health_status["system_health"] = app_state.resilience_service.get_health_status()
+    
+    return health_status
+
+
+@app.get("/api/version")
+async def version_info():
+    """Get version information"""
+    if app_state.resilience_initialized and app_state.resilience_service:
+        return app_state.resilience_service.get_version_info()
+    return {"version": "unknown", "message": "Resilience service not available"}
+
+
+@app.get("/api/backup/info")
+async def backup_info():
+    """Get backup schedule information"""
+    if app_state.resilience_initialized and app_state.resilience_service:
+        return app_state.resilience_service.get_backup_info()
+    return {"status": "not_available", "message": "Resilience service not available"}
 
 # ===========================
 # Initialize Authentication Service
