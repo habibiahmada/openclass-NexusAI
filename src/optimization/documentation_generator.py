@@ -166,7 +166,7 @@ OpenClass Nexus AI adalah platform tutor AI pendidikan yang dirancang khusus unt
 
 6. **Unduh Model AI**
    ```bash
-   python -c "from src.local_inference.model_downloader import ModelDownloader; ModelDownloader().download_model()"
+   python -c "from src.edge_runtime.model_downloader import ModelDownloader; ModelDownloader().download_model()"
    ```
 
 ## Konfigurasi
@@ -216,13 +216,13 @@ BATCH_SIZE=10
 source openclass-env/bin/activate
 
 # Jalankan sistem
-python -m src.local_inference.complete_pipeline
+python -m src.edge_runtime.complete_pipeline
 ```
 
 ### 2. Mengajukan Pertanyaan
 
 ```python
-from src.local_inference.complete_pipeline import CompletePipeline
+from src.edge_runtime.complete_pipeline import CompletePipeline
 
 # Inisialisasi pipeline
 pipeline = CompletePipeline()
@@ -249,7 +249,7 @@ print(f"Sumber: {response['sources']}")
 ### 1. Pemrosesan Batch
 
 ```python
-from src.local_inference.batch_processor import BatchProcessor
+from src.edge_runtime.batch_processor import BatchProcessor
 
 processor = BatchProcessor()
 questions = [
@@ -268,7 +268,7 @@ for result in results:
 ### 2. Monitoring Performa
 
 ```python
-from src.local_inference.performance_monitor import PerformanceMonitor
+from src.edge_runtime.performance_monitor import PerformanceMonitor
 
 monitor = PerformanceMonitor()
 monitor.start_monitoring()
@@ -284,7 +284,7 @@ print(f"Penggunaan memori: {metrics['memory_usage_mb']}MB")
 ### 3. Validasi Pendidikan
 
 ```python
-from src.local_inference.educational_validator import EducationalValidator
+from src.edge_runtime.educational_validator import EducationalValidator
 
 validator = EducationalValidator()
 validation_result = validator.validate_response(
@@ -334,7 +334,7 @@ print(f"Kualitas bahasa: {validation_result['language_quality']}")
 #### Mengaktifkan Log Detail
 ```bash
 export LOG_LEVEL=DEBUG
-python -m src.local_inference.complete_pipeline
+python -m src.edge_runtime.complete_pipeline
 ```
 
 #### Lokasi File Log
@@ -428,7 +428,7 @@ OpenClass Nexus AI is an educational AI tutoring platform specifically designed 
 
 6. **Download AI Model**
    ```bash
-   python -c "from src.local_inference.model_downloader import ModelDownloader; ModelDownloader().download_model()"
+   python -c "from src.edge_runtime.model_downloader import ModelDownloader; ModelDownloader().download_model()"
    ```
 
 ## Configuration
@@ -478,13 +478,13 @@ BATCH_SIZE=10
 source openclass-env/bin/activate
 
 # Run the system
-python -m src.local_inference.complete_pipeline
+python -m src.edge_runtime.complete_pipeline
 ```
 
 ### 2. Asking Questions
 
 ```python
-from src.local_inference.complete_pipeline import CompletePipeline
+from src.edge_runtime.complete_pipeline import CompletePipeline
 
 # Initialize pipeline
 pipeline = CompletePipeline()
@@ -511,7 +511,7 @@ print(f"Sources: {response['sources']}")
 ### 1. Batch Processing
 
 ```python
-from src.local_inference.batch_processor import BatchProcessor
+from src.edge_runtime.batch_processor import BatchProcessor
 
 processor = BatchProcessor()
 questions = [
@@ -530,7 +530,7 @@ for result in results:
 ### 2. Performance Monitoring
 
 ```python
-from src.local_inference.performance_monitor import PerformanceMonitor
+from src.edge_runtime.performance_monitor import PerformanceMonitor
 
 monitor = PerformanceMonitor()
 monitor.start_monitoring()
@@ -546,7 +546,7 @@ print(f"Memory usage: {metrics['memory_usage_mb']}MB")
 ### 3. Educational Validation
 
 ```python
-from src.local_inference.educational_validator import EducationalValidator
+from src.edge_runtime.educational_validator import EducationalValidator
 
 validator = EducationalValidator()
 validation_result = validator.validate_response(
@@ -596,7 +596,7 @@ print(f"Language quality: {validation_result['language_quality']}")
 #### Enable Detailed Logging
 ```bash
 export LOG_LEVEL=DEBUG
-python -m src.local_inference.complete_pipeline
+python -m src.edge_runtime.complete_pipeline
 ```
 
 #### Log File Locations
@@ -1036,7 +1036,7 @@ sudo chown -R openclass:openclass /opt/openclass
 python scripts/setup_phase2_aws.py
 
 # Download and cache models
-python -c "from src.local_inference.model_downloader import ModelDownloader; ModelDownloader().download_model()"
+python -c "from src.edge_runtime.model_downloader import ModelDownloader; ModelDownloader().download_model()"
 ```
 
 #### 5. Web Server Configuration
@@ -1091,7 +1091,7 @@ server {{
 **Supervisor Configuration (/etc/supervisor/conf.d/openclass.conf)**:
 ```ini
 [program:openclass-api]
-command=/home/openclass/openclass-nexus-ai/venv/bin/python -m src.local_inference.complete_pipeline
+command=/home/openclass/openclass-nexus-ai/venv/bin/python -m src.edge_runtime.complete_pipeline
 directory=/home/openclass/openclass-nexus-ai
 user=openclass
 autostart=true
@@ -1103,7 +1103,7 @@ stdout_logfile_backups=10
 environment=PATH="/home/openclass/openclass-nexus-ai/venv/bin"
 
 [program:openclass-worker]
-command=/home/openclass/openclass-nexus-ai/venv/bin/python -m src.local_inference.batch_processor
+command=/home/openclass/openclass-nexus-ai/venv/bin/python -m src.edge_runtime.batch_processor
 directory=/home/openclass/openclass-nexus-ai
 user=openclass
 autostart=true
@@ -1153,7 +1153,7 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \\
     CMD curl -f http://localhost:8000/health || exit 1
 
 # Start application
-CMD ["python", "-m", "src.local_inference.complete_pipeline"]
+CMD ["python", "-m", "src.edge_runtime.complete_pipeline"]
 ```
 
 **Docker Compose (docker-compose.yml)**:
@@ -1613,7 +1613,7 @@ MemoryAccounting=yes
 **Solution 1 - Optimize Model Loading**:
 ```python
 # Pre-load model at startup
-from src.local_inference.model_manager import ModelManager
+from src.edge_runtime.model_manager import ModelManager
 manager = ModelManager()
 manager.preload_model()  # Load model into memory at startup
 ```
@@ -2036,7 +2036,7 @@ When reporting issues, please include:
 Basic usage example for OpenClass Nexus AI
 \"\"\"
 
-from src.local_inference.complete_pipeline import CompletePipeline
+from src.edge_runtime.complete_pipeline import CompletePipeline
 
 def main():
     # Initialize the pipeline
@@ -2070,8 +2070,8 @@ if __name__ == "__main__":
 Batch processing example for OpenClass Nexus AI
 \"\"\"
 
-from src.local_inference.batch_processor import BatchProcessor
-from src.local_inference.performance_monitor import PerformanceMonitor
+from src.edge_runtime.batch_processor import BatchProcessor
+from src.edge_runtime.performance_monitor import PerformanceMonitor
 
 def main():
     # Initialize components

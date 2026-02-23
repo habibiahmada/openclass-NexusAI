@@ -18,11 +18,11 @@ def main():
         # Import components
         from src.embeddings.chroma_manager import ChromaDBManager
         from src.embeddings.bedrock_client import BedrockEmbeddingsClient
-        from src.local_inference.inference_engine import InferenceEngine
-        from src.local_inference.model_config import InferenceConfig, ModelConfig
-        from src.local_inference.rag_pipeline import RAGPipeline
-        from src.local_inference.context_manager import ContextManager
-        from src.local_inference.fallback_handler import FallbackHandler, FallbackReason
+        from src.edge_runtime.inference_engine import InferenceEngine
+        from src.edge_runtime.model_config import InferenceConfig, ModelConfig
+        from src.edge_runtime.rag_pipeline import RAGPipeline
+        from src.edge_runtime.context_manager import ContextManager
+        from src.edge_runtime.fallback_handler import FallbackHandler, FallbackReason
         
         print("=== RAG Pipeline Integration Example ===\n")
         

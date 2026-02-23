@@ -9,7 +9,7 @@ This guide covers deploying OpenClass Nexus AI in production environments, inclu
 ### 1. Standalone Desktop Application
 
 **Use Case**: Individual users, offline environments
-**Requirements**: 4GB RAM, 10GB storage
+**Requirements**: 16GB RAM, 512GB SSD storage
 
 ```bash
 # Create standalone package

@@ -14,9 +14,9 @@ from unittest.mock import Mock, patch, MagicMock
 from typing import List, Dict, Any
 
 # Import the components we're testing
-from src.local_inference.complete_pipeline import CompletePipeline, PipelineConfig
-from src.local_inference.performance_benchmarking import run_quick_benchmark
-from src.local_inference.batch_processor import QueryPriority
+from src.edge_runtime.complete_pipeline import CompletePipeline, PipelineConfig
+from src.edge_runtime.performance_benchmarking import run_quick_benchmark
+from src.edge_runtime.batch_processor import QueryPriority
 
 
 class TestCompletePipelineIntegrationSimple:
@@ -68,7 +68,7 @@ class TestCompletePipelineIntegrationSimple:
              patch('src.embeddings.bedrock_client.BedrockEmbeddingsClient'):
             
             # Setup required attributes
-            from src.local_inference.model_config import ModelConfig, InferenceConfig
+            from src.edge_runtime.model_config import ModelConfig, InferenceConfig
             pipeline.model_config = ModelConfig()
             pipeline.inference_configs = {"default": InferenceConfig()}
             
@@ -133,7 +133,7 @@ class TestCompletePipelineIntegrationSimple:
              patch('src.embeddings.bedrock_client.BedrockEmbeddingsClient'):
             
             # Setup required attributes
-            from src.local_inference.model_config import ModelConfig, InferenceConfig
+            from src.edge_runtime.model_config import ModelConfig, InferenceConfig
             pipeline.model_config = ModelConfig()
             pipeline.inference_configs = {"default": InferenceConfig()}
             
@@ -200,7 +200,7 @@ class TestCompletePipelineIntegrationSimple:
              patch('src.embeddings.bedrock_client.BedrockEmbeddingsClient'):
             
             # Setup required attributes
-            from src.local_inference.model_config import ModelConfig, InferenceConfig
+            from src.edge_runtime.model_config import ModelConfig, InferenceConfig
             pipeline.model_config = ModelConfig()
             pipeline.inference_configs = {"default": InferenceConfig()}
             
@@ -281,7 +281,7 @@ class TestCompletePipelineIntegrationSimple:
              patch('src.embeddings.bedrock_client.BedrockEmbeddingsClient'):
             
             # Setup required attributes
-            from src.local_inference.model_config import ModelConfig, InferenceConfig
+            from src.edge_runtime.model_config import ModelConfig, InferenceConfig
             pipeline.model_config = ModelConfig()
             pipeline.inference_configs = {"default": InferenceConfig()}
             
@@ -330,7 +330,7 @@ class TestCompletePipelineIntegrationSimple:
              patch('src.embeddings.bedrock_client.BedrockEmbeddingsClient'):
             
             # Setup required attributes
-            from src.local_inference.model_config import ModelConfig, InferenceConfig
+            from src.edge_runtime.model_config import ModelConfig, InferenceConfig
             pipeline.model_config = ModelConfig()
             pipeline.inference_configs = {"default": InferenceConfig()}
             

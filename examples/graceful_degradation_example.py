@@ -16,9 +16,9 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Import local inference components
-from src.local_inference.resource_manager import MemoryMonitor, ThreadManager
-from src.local_inference.performance_monitor import PerformanceTracker, PerformanceMetrics
-from src.local_inference.graceful_degradation import (
+from src.edge_runtime.resource_manager import MemoryMonitor, ThreadManager
+from src.edge_runtime.performance_monitor import PerformanceTracker, PerformanceMetrics
+from src.edge_runtime.graceful_degradation import (
     GracefulDegradationManager,
     DegradationLevel,
     DegradationConfig,
@@ -213,7 +213,7 @@ def main():
     try:
         # Initialize resource monitoring components
         print("Initializing resource monitoring...")
-        memory_monitor = MemoryMonitor(memory_limit_mb=3072)
+        memory_monitor = MemoryMonitor()
         thread_manager = ThreadManager()
         performance_tracker = PerformanceTracker()
         

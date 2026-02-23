@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - OpenClass Nexus AI</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin_dashboard.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <h1>🎛️ Admin Dashboard</h1>
+            <div class="header-actions">
+                <span id="last-refresh">Last refresh: --:--</span>
+                <button onclick="refreshDashboard()" class="btn btn-primary">🔄 Refresh</button>
+                <a href="index.html" class="btn btn-secondary">← Back to Chat</a>
+            </div>
+        </header>
+
+        <!-- AWS Services Status -->
+        <section class="dashboard-section">
+            <h2>☁️ AWS Services Status</h2>
+            <div class="cards-grid">
+                <!-- S3 Storage -->
+                <div class="status-card">
+                    <div class="card-header">
+                        <h3>📦 S3 Storage</h3>
+                        <span id="s3-status" class="status-badge status-unknown">Checking...</span>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Bucket:</strong> <span id="s3-bucket">--</span></p>
+                        <p><strong>Last Upload:</strong> <span id="s3-last-upload">--</span></p>
+                        <p><strong>Total Files:</strong> <span id="s3-total-files">--</span></p>
+                        <p><strong>Storage Used:</strong> <span id="s3-storage">--</span></p>
+                    </div>
+                </div>
+
+                <!-- Bedrock Embeddings -->
+                <div class="status-card">
+                    <div class="card-header">
+                        <h3>🧠 Bedrock Embeddings</h3>
+                        <span id="bedrock-status" class="status-badge status-unknown">Checking...</span>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Strategy:</strong> <span id="bedrock-strategy">--</span></p>
+                        <p><strong>Model:</strong> <span id="bedrock-model">--</span></p>
+                        <p><strong>Fallback:</strong> <span id="bedrock-fallback">--</span></p>
+                        <p><strong>Region:</strong> <span id="bedrock-region">--</span></p>
+                    </div>
+                </div>
+
+                <!-- CloudFront CDN -->
+                <div class="status-card">
+                    <div class="card-header">
+                        <h3>🌐 CloudFront CDN</h3>
+                        <span id="cloudfront-status" class="status-badge status-unknown">Checking...</span>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Distribution:</strong> <span id="cloudfront-dist">--</span></p>
+                        <p><strong>Domain:</strong> <span id="cloudfront-domain">--</span></p>
+                        <p><strong>Last Invalidation:</strong> <span id="cloudfront-invalidation">--</span></p>
+                        <button onclick="invalidateCache()" class="btn btn-sm btn-warning">Invalidate Cache</button>
+                    </div>
+                </div>
+
+                <!-- Lambda Processor -->
+                <div class="status-card">
+                    <div class="card-header">
+                        <h3>⚡ Lambda Processor</h3>
+                        <span id="lambda-status" class="status-badge status-unknown">Checking...</span>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Function:</strong> <span id="lambda-function">--</span></p>
+                        <p><strong>Last Execution:</strong> <span id="lambda-last-exec">--</span></p>
+                        <p><strong>Success Rate:</strong> <span id="lambda-success-rate">--</span></p>
+                        <p><strong>Avg Duration:</strong> <span id="lambda-duration">--</span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- System Health -->
+        <section class="dashboard-section">
+            <h2>💚 System Health</h2>
+            <div class="cards-grid">
+                <!-- PostgreSQL -->
+                <div class="status-card">
+                    <div class="card-header">
+                        <h3>🗄️ PostgreSQL</h3>
+                        <span id="postgres-status" class="status-badge status-unknown">Checking...</span>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Connection:</strong> <span id="postgres-connection">--</span></p>
+                        <p><strong>Latency:</strong> <span id="postgres-latency">--</span></p>
+                        <p><strong>Active Connections:</strong> <span id="postgres-connections">--</span></p>
+                        <p><strong>Database Size:</strong> <span id="postgres-size">--</span></p>
+                    </div>
+                </div>
+
+                <!-- ChromaDB -->
+                <div class="status-card">
+                    <div class="card-header">
+                        <h3>🔍 ChromaDB</h3>
+                        <span id="chromadb-status" class="status-badge status-unknown">Checking...</span>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Collections:</strong> <span id="chromadb-collections">--</span></p>
+                        <p><strong>Total Documents:</strong> <span id="chromadb-documents">--</span></p>
+                        <p><strong>Storage Size:</strong> <span id="chromadb-size">--</span></p>
+                        <p><strong>Last Update:</strong> <span id="chromadb-last-update">--</span></p>
+                    </div>
+                </div>
+
+                <!-- LLM Model -->
+                <div class="status-card">
+                    <div class="card-header">
+                        <h3>🤖 LLM Model</h3>
+                        <span id="llm-status" class="status-badge status-unknown">Checking...</span>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Model:</strong> <span id="llm-model">--</span></p>
+                        <p><strong>Status:</strong> <span id="llm-loaded">--</span></p>
+                        <p><strong>Memory Usage:</strong> <span id="llm-memory">--</span></p>
+                        <p><strong>Inference Time:</strong> <span id="llm-inference-time">--</span></p>
+                    </div>
+                </div>
+
+                <!-- System Resources -->
+                <div class="status-card">
+                    <div class="card-header">
+                        <h3>💻 System Resources</h3>
+                        <span id="resources-status" class="status-badge status-unknown">Checking...</span>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>CPU Usage:</strong> <span id="cpu-usage">--</span></p>
+                        <p><strong>RAM Usage:</strong> <span id="ram-usage">--</span></p>
+                        <p><strong>Disk Space:</strong> <span id="disk-space">--</span></p>
+                        <p><strong>Uptime:</strong> <span id="system-uptime">--</span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recent Activity -->
+        <section class="dashboard-section">
+            <h2>📊 Recent Activity</h2>
+            <div class="cards-grid">
+                <!-- ETL Pipeline Runs -->
+                <div class="activity-card">
+                    <h3>🔄 ETL Pipeline Runs</h3>
+                    <div id="etl-runs-list" class="activity-list">
+                        <p class="loading">Loading...</p>
+                    </div>
+                    <a href="job_history.html" class="btn btn-sm btn-link">View All →</a>
+                </div>
+
+                <!-- VKP Updates -->
+                <div class="activity-card">
+                    <h3>📦 VKP Updates</h3>
+                    <div id="vkp-updates-list" class="activity-list">
+                        <p class="loading">Loading...</p>
+                    </div>
+                    <a href="vkp_manager.html" class="btn btn-sm btn-link">View All →</a>
+                </div>
+
+                <!-- Telemetry Uploads -->
+                <div class="activity-card">
+                    <h3>📈 Telemetry Uploads</h3>
+                    <div id="telemetry-uploads-list" class="activity-list">
+                        <p class="loading">Loading...</p>
+                    </div>
+                    <a href="telemetry_dashboard.html" class="btn btn-sm btn-link">View Dashboard →</a>
+                </div>
+
+                <!-- Backups -->
+                <div class="activity-card">
+                    <h3>💾 Backups</h3>
+                    <div id="backups-list" class="activity-list">
+                        <p class="loading">Loading...</p>
+                    </div>
+                    <button onclick="runManualBackup()" class="btn btn-sm btn-primary">Run Backup Now</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="dashboard-section">
+            <h2>⚡ Quick Actions</h2>
+            <div class="quick-actions">
+                <button onclick="checkVKPUpdates()" class="action-btn">
+                    <span class="icon">🔄</span>
+                    <span class="label">Check VKP Updates</span>
+                </button>
+                <button onclick="runETLPipeline()" class="action-btn">
+                    <span class="icon">▶️</span>
+                    <span class="label">Run ETL Pipeline</span>
+                </button>
+                <button onclick="invalidateCache()" class="action-btn">
+                    <span class="icon">🗑️</span>
+                    <span class="label">Invalidate Cache</span>
+                </button>
+                <button onclick="runManualBackup()" class="action-btn">
+                    <span class="icon">💾</span>
+                    <span class="label">Manual Backup</span>
+                </button>
+                <button onclick="viewJobHistory()" class="action-btn">
+                    <span class="icon">📊</span>
+                    <span class="label">Job History</span>
+                </button>
+                <button onclick="openSettings()" class="action-btn">
+                    <span class="icon">⚙️</span>
+                    <span class="label">Settings</span>
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <!-- Loading Modal -->
+    <div id="loading-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="spinner"></div>
+            <p id="loading-message">Processing...</p>
+        </div>
+    </div>
+
+    <script src="../js/admin_dashboard.js"></script>
+    <script src="../js/notifications.js"></script>
+    <script src="../js/websocket.js"></script>
+</body>
+</html>

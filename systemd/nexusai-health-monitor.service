@@ -1,0 +1,27 @@
+[Unit]
+Description=NexusAI Health Monitoring Daemon
+After=network.target nexusai-api.service
+Wants=nexusai-api.service
+
+[Service]
+Type=simple
+User=nexusai
+Group=nexusai
+WorkingDirectory=/opt/nexusai
+Environment="PATH=/opt/nexusai/openclass-env/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="PYTHONPATH=/opt/nexusai"
+ExecStart=/opt/nexusai/openclass-env/bin/python /opt/nexusai/src/resilience/health_daemon.py
+Restart=on-failure
+RestartSec=30s
+StandardOutput=journal
+StandardError=journal
+
+# Resource limits
+LimitNOFILE=4096
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

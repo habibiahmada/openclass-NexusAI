@@ -5,7 +5,7 @@
 Sistem dirancang untuk:
 
 1. **Offline-first**: Berjalan tanpa internet
-2. **Low-spec friendly**: RAM 4GB, tanpa GPU
+2. **Production-ready**: Optimized for 16GB RAM school servers
 3. **Easy deployment**: Mudah dipasang oleh sekolah
 4. **User-friendly**: Mudah digunakan siswa SD–SMA
 5. **Maintainable**: Mudah dipelihara dan di-update

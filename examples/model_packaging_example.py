@@ -22,12 +22,12 @@ sys.path.insert(0, 'src')
 
 try:
     # Try direct imports first
-    from local_inference.model_packager import (
+    from edge_runtime.model_packager import (
         ModelPackager, 
         ModelPackageMetadata,
         create_model_package
     )
-    from local_inference.delta_updater import (
+    from edge_runtime.delta_updater import (
         DeltaUpdater,
         create_delta_update,
         apply_delta_update
@@ -35,12 +35,12 @@ try:
 except ImportError:
     try:
         # Try with src prefix
-        from src.local_inference.model_packager import (
+        from src.edge_runtime.model_packager import (
             ModelPackager, 
             ModelPackageMetadata,
             create_model_package
         )
-        from src.local_inference.delta_updater import (
+        from src.edge_runtime.delta_updater import (
             DeltaUpdater,
             create_delta_update,
             apply_delta_update

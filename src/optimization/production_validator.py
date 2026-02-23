@@ -44,8 +44,8 @@ class ProductionReadinessValidator:
         
         try:
             # Import required modules for testing
-            from src.local_inference.complete_pipeline import CompletePipeline
-            from src.local_inference.config_manager import ConfigurationManager
+            from src.edge_runtime.complete_pipeline import CompletePipeline
+            from src.edge_runtime.config_manager import ConfigurationManager
             
             # Initialize pipeline for testing
             config_manager = ConfigurationManager()
@@ -157,8 +157,8 @@ class ProductionReadinessValidator:
     def _test_concurrent_processing(self) -> bool:
         """Test concurrent processing capability."""
         try:
-            from src.local_inference.complete_pipeline import CompletePipeline
-            from src.local_inference.config_manager import ConfigurationManager
+            from src.edge_runtime.complete_pipeline import CompletePipeline
+            from src.edge_runtime.config_manager import ConfigurationManager
             
             config_manager = ConfigurationManager()
             pipeline = CompletePipeline(config_manager)
@@ -192,8 +192,8 @@ class ProductionReadinessValidator:
     def _test_system_stability(self) -> bool:
         """Test system stability over time."""
         try:
-            from src.local_inference.complete_pipeline import CompletePipeline
-            from src.local_inference.config_manager import ConfigurationManager
+            from src.edge_runtime.complete_pipeline import CompletePipeline
+            from src.edge_runtime.config_manager import ConfigurationManager
             
             config_manager = ConfigurationManager()
             pipeline = CompletePipeline(config_manager)
@@ -268,7 +268,7 @@ class ProductionReadinessValidator:
     def _check_config_manager(self) -> Tuple[bool, str, str]:
         """Check configuration manager component."""
         try:
-            from src.local_inference.config_manager import ConfigurationManager
+            from src.edge_runtime.config_manager import ConfigurationManager
             config_manager = ConfigurationManager()
             
             # Basic functionality test
@@ -284,8 +284,8 @@ class ProductionReadinessValidator:
     def _check_model_manager(self) -> Tuple[bool, str, str]:
         """Check model manager component."""
         try:
-            from src.local_inference.model_manager import ModelManager
-            from src.local_inference.config_manager import ConfigurationManager
+            from src.edge_runtime.model_manager import ModelManager
+            from src.edge_runtime.config_manager import ConfigurationManager
             
             config_manager = ConfigurationManager()
             model_manager = ModelManager(config_manager)
@@ -318,8 +318,8 @@ class ProductionReadinessValidator:
     def _check_inference_engine(self) -> Tuple[bool, str, str]:
         """Check inference engine component."""
         try:
-            from src.local_inference.inference_engine import InferenceEngine
-            from src.local_inference.config_manager import ConfigurationManager
+            from src.edge_runtime.inference_engine import InferenceEngine
+            from src.edge_runtime.config_manager import ConfigurationManager
             
             config_manager = ConfigurationManager()
             inference_engine = InferenceEngine(config_manager)
@@ -332,8 +332,8 @@ class ProductionReadinessValidator:
     def _check_rag_pipeline(self) -> Tuple[bool, str, str]:
         """Check RAG pipeline component."""
         try:
-            from src.local_inference.rag_pipeline import RAGPipeline
-            from src.local_inference.config_manager import ConfigurationManager
+            from src.edge_runtime.rag_pipeline import RAGPipeline
+            from src.edge_runtime.config_manager import ConfigurationManager
             
             config_manager = ConfigurationManager()
             rag_pipeline = RAGPipeline(config_manager)
@@ -346,7 +346,7 @@ class ProductionReadinessValidator:
     def _check_performance_monitor(self) -> Tuple[bool, str, str]:
         """Check performance monitor component."""
         try:
-            from src.local_inference.performance_monitor import PerformanceTracker
+            from src.edge_runtime.performance_monitor import PerformanceTracker
             
             performance_tracker = PerformanceTracker()
             
@@ -492,7 +492,7 @@ RUN mkdir -p data/vector_db data/processed models/cache
 EXPOSE 8000
 
 # Run application
-CMD ["python", "-m", "src.local_inference.complete_pipeline"]
+CMD ["python", "-m", "src.edge_runtime.complete_pipeline"]
 """
         dockerfile.write_text(dockerfile_content, encoding='utf-8')
         scripts.append("Dockerfile")

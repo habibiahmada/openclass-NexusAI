@@ -12,7 +12,7 @@ from unittest.mock import Mock, patch, MagicMock
 import pytest
 from hypothesis import given, strategies as st, settings
 
-from src.cloud_sync.s3_storage_manager import S3StorageManager
+from src.aws_control_plane.s3_storage_manager import S3StorageManager
 
 
 # Configure Hypothesis
@@ -69,7 +69,7 @@ def test_property_s3_path_structure(subject, grade, filename):
     s3://bucket/processed/{subject}/{grade}/filename
     """
     # Create S3 manager with mocked client
-    with patch('src.cloud_sync.s3_storage_manager.aws_config') as mock_config:
+    with patch('src.aws_control_plane.s3_storage_manager.aws_config') as mock_config:
         mock_config.s3_bucket = "test-bucket"
         mock_config.get_s3_client.return_value = Mock()
         
@@ -110,7 +110,7 @@ def test_property_s3_path_normalization(subject, grade, filename):
     to lowercase with underscores.
     """
     # Create S3 manager with mocked client
-    with patch('src.cloud_sync.s3_storage_manager.aws_config') as mock_config:
+    with patch('src.aws_control_plane.s3_storage_manager.aws_config') as mock_config:
         mock_config.s3_bucket = "test-bucket"
         mock_config.get_s3_client.return_value = Mock()
         
@@ -157,7 +157,7 @@ def test_property_s3_path_consistency(subject, grade, filename):
     should always return the same path.
     """
     # Create S3 manager with mocked client
-    with patch('src.cloud_sync.s3_storage_manager.aws_config') as mock_config:
+    with patch('src.aws_control_plane.s3_storage_manager.aws_config') as mock_config:
         mock_config.s3_bucket = "test-bucket"
         mock_config.get_s3_client.return_value = Mock()
         
@@ -194,7 +194,7 @@ def test_property_compression_applied(content):
     
     try:
         # Create S3 manager with mocked client
-        with patch('src.cloud_sync.s3_storage_manager.aws_config') as mock_config:
+        with patch('src.aws_control_plane.s3_storage_manager.aws_config') as mock_config:
             mock_config.s3_bucket = "test-bucket"
             
             # Create mock S3 client
@@ -260,7 +260,7 @@ def test_property_compression_reduces_size(content):
     
     try:
         # Create S3 manager with mocked client
-        with patch('src.cloud_sync.s3_storage_manager.aws_config') as mock_config:
+        with patch('src.aws_control_plane.s3_storage_manager.aws_config') as mock_config:
             mock_config.s3_bucket = "test-bucket"
             mock_config.get_s3_client.return_value = Mock()
             
@@ -317,7 +317,7 @@ def test_property_compression_round_trip(content):
     
     try:
         # Create S3 manager with mocked client
-        with patch('src.cloud_sync.s3_storage_manager.aws_config') as mock_config:
+        with patch('src.aws_control_plane.s3_storage_manager.aws_config') as mock_config:
             mock_config.s3_bucket = "test-bucket"
             mock_config.get_s3_client.return_value = Mock()
             

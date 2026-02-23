@@ -131,8 +131,8 @@ class SystemValidator:
     def _run_integration_test(self) -> Dict[str, Any]:
         """Run system integration test."""
         try:
-            from src.local_inference.complete_pipeline import CompletePipeline
-            from src.local_inference.config_manager import ConfigurationManager
+            from src.edge_runtime.complete_pipeline import CompletePipeline
+            from src.edge_runtime.config_manager import ConfigurationManager
             
             # Initialize complete pipeline
             config_manager = ConfigurationManager()

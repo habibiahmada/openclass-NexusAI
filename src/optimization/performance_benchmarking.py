@@ -18,10 +18,10 @@ import json
 import psutil
 import statistics
 
-from src.local_inference.complete_pipeline import CompletePipeline, PipelineConfig
-from src.local_inference.performance_monitor import PerformanceMetrics, PerformanceTracker
-from src.local_inference.batch_processor import BatchProcessor, QueryPriority
-from src.local_inference.resource_manager import MemoryMonitor
+from src.edge_runtime.complete_pipeline import CompletePipeline, PipelineConfig
+from src.edge_runtime.performance_monitor import PerformanceMetrics, PerformanceTracker
+from src.edge_runtime.batch_processor import BatchProcessor, QueryPriority
+from src.edge_runtime.resource_manager import MemoryMonitor
 
 logger = logging.getLogger(__name__)
 

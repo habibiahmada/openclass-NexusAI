@@ -16,11 +16,11 @@ from unittest.mock import patch, MagicMock
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
-from local_inference.config_manager import (
+from edge_runtime.config_manager import (
     ConfigurationManager, HardwareDetector, ConfigurationValidator,
     SystemConfiguration, HardwareProfile, ConfigFormat
 )
-from local_inference.model_config import ModelConfig, InferenceConfig
+from edge_runtime.model_config import ModelConfig, InferenceConfig
 
 
 class TestHardwareDetector:

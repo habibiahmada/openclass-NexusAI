@@ -17,7 +17,7 @@ OpenClass Nexus AI adalah sistem tutor AI offline yang dirancang khusus untuk pe
 - ✅ Menjawab pertanyaan tentang materi pelajaran SMA
 - ✅ Bekerja sepenuhnya offline setelah instalasi
 - ✅ Menggunakan kurikulum BSE Kemdikbud
-- ✅ Berjalan pada laptop dengan RAM 4GB
+- ✅ Berjalan pada server sekolah dengan 16GB RAM
 - ✅ Memberikan jawaban dalam Bahasa Indonesia
 
 ## Instalasi
@@ -26,8 +26,9 @@ OpenClass Nexus AI adalah sistem tutor AI offline yang dirancang khusus untuk pe
 
 **Minimum**:
 - Windows 10/11, macOS 10.15+, atau Linux Ubuntu 18.04+
-- RAM: 4GB
-- Storage: 10GB ruang kosong
+- RAM: 16GB
+- CPU: 8-core
+- Storage: 512GB SSD
 - Internet: Diperlukan untuk instalasi awal
 
 **Direkomendasikan**:

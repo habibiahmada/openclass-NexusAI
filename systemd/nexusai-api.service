@@ -1,0 +1,28 @@
+[Unit]
+Description=NexusAI API Server
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=nexusai
+Group=nexusai
+WorkingDirectory=/opt/nexusai
+Environment="PATH=/opt/nexusai/openclass-env/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="PYTHONPATH=/opt/nexusai"
+ExecStart=/opt/nexusai/openclass-env/bin/python -m uvicorn src.api.main:app --host 0.0.0.0 --port 8000
+Restart=on-failure
+RestartSec=10s
+StandardOutput=journal
+StandardError=journal
+
+# Resource limits
+LimitNOFILE=65536
+MemoryLimit=14G
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

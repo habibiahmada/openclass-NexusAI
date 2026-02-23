@@ -16,11 +16,11 @@ import threading
 import concurrent.futures
 
 # Import the components we're testing
-from src.local_inference.complete_pipeline import CompletePipeline, PipelineConfig
-from src.local_inference.performance_benchmarking import (
+from src.edge_runtime.complete_pipeline import CompletePipeline, PipelineConfig
+from src.edge_runtime.performance_benchmarking import (
     PerformanceBenchmarkRunner, IndonesianEducationalBenchmarks, run_quick_benchmark
 )
-from src.local_inference.batch_processor import QueryPriority
+from src.edge_runtime.batch_processor import QueryPriority
 from src.embeddings.chroma_manager import ChromaDBManager
 
 
@@ -136,7 +136,7 @@ class TestCompletePipelineIntegration:
              patch.object(pipeline, '_initialize_rag_pipeline') as mock_init_rag:
             
             # Setup required attributes that would be set during initialization
-            from src.local_inference.model_config import ModelConfig, InferenceConfig
+            from src.edge_runtime.model_config import ModelConfig, InferenceConfig
             pipeline.model_config = ModelConfig()
             pipeline.inference_configs = {"default": InferenceConfig()}
             
@@ -219,7 +219,7 @@ class TestCompletePipelineIntegration:
              patch('src.embeddings.bedrock_client.BedrockEmbeddingsClient') as mock_bedrock:
             
             # Setup required attributes that would be set during initialization
-            from src.local_inference.model_config import ModelConfig, InferenceConfig
+            from src.edge_runtime.model_config import ModelConfig, InferenceConfig
             pipeline.model_config = ModelConfig()
             pipeline.inference_configs = {"default": InferenceConfig()}
             
@@ -296,7 +296,7 @@ class TestCompletePipelineIntegration:
              patch.object(pipeline, '_initialize_vector_database') as mock_init_db:
             
             # Setup required attributes that would be set during initialization
-            from src.local_inference.model_config import ModelConfig, InferenceConfig
+            from src.edge_runtime.model_config import ModelConfig, InferenceConfig
             pipeline.model_config = ModelConfig()
             pipeline.inference_configs = {"default": InferenceConfig()}
             
@@ -413,7 +413,7 @@ class TestCompletePipelineIntegration:
              patch.object(pipeline, '_initialize_vector_database') as mock_init_db:
             
             # Setup required attributes that would be set during initialization
-            from src.local_inference.model_config import ModelConfig, InferenceConfig
+            from src.edge_runtime.model_config import ModelConfig, InferenceConfig
             pipeline.model_config = ModelConfig()
             pipeline.inference_configs = {"default": InferenceConfig()}
             
@@ -527,7 +527,7 @@ class TestCompletePipelineIntegration:
              patch.object(pipeline, '_initialize_vector_database') as mock_init_db:
             
             # Setup required attributes that would be set during initialization
-            from src.local_inference.model_config import ModelConfig, InferenceConfig
+            from src.edge_runtime.model_config import ModelConfig, InferenceConfig
             pipeline.model_config = ModelConfig()
             pipeline.inference_configs = {"default": InferenceConfig()}
             
