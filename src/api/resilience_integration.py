@@ -111,19 +111,12 @@ class ResilienceService:
         try:
             health = self.health_monitor.run_health_checks()
             return {
-                "status": "healthy" if health.overall_status.value == "healthy" else "degraded",
-                "checks": {
-                    "disk_space": health.disk_space.status.value,
-                    "ram_usage": health.ram_usage.status.value,
-                    "chromadb": health.chromadb.status.value,
-                    "llm": health.llm.status.value
-                },
-                "details": {
-                    "disk_space": health.disk_space.message,
-                    "ram_usage": health.ram_usage.message,
-                    "chromadb": health.chromadb.message,
-                    "llm": health.llm.message
-                }
+                "status": "healthy" if health.healthy else "degraded",
+                "checks": {k: v.level.value for k, v in health.checks.items()},
+                "details": {k: v.message for k, v in health.checks.items()},
+                "critical_failures": health.critical_failures,
+                "warnings": health.warnings,
+                "timestamp": health.timestamp
             }
         except Exception as e:
             logger.error(f"Health check failed: {e}", exc_info=True)

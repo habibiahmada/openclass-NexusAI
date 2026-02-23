@@ -7,12 +7,13 @@ All business logic has been modularized into separate modules.
 """
 
 import logging
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 # Import configuration
-from src.api.config import config
+from config.app_config import app_config as config
 
 # Import state management
 from src.api.state import app_state
@@ -32,46 +33,19 @@ from src.api.routers.cache_router import create_cache_router
 
 # Configure logging
 logging.basicConfig(
-    level=getattr(logging, config.LOG_LEVEL),
+    level=getattr(logging, config.log_level.upper()),
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
-# ===========================
-# Initialize FastAPI App
-# ===========================
-app = FastAPI(
-    title="OpenClass Nexus AI API",
-    description="Local AI Tutor API untuk Kurikulum Nasional",
-    version="1.0.0",
-    debug=config.DEBUG
-)
 
 # ===========================
-# CORS Middleware
+# Lifespan Event Handler
 # ===========================
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=config.CORS_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# ===========================
-# Mount Static Files
-# ===========================
-if config.FRONTEND_DIR.exists():
-    app.mount("/static", StaticFiles(directory=str(config.FRONTEND_DIR)), name="static")
-else:
-    logger.warning(f"Frontend directory not found: {config.FRONTEND_DIR}")
-
-# ===========================
-# Startup Event
-# ===========================
-@app.on_event("startup")
-async def startup_event():
-    """Initialize application on startup"""
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Handle startup and shutdown events"""
+    # Startup
     logger.info("=" * 60)
     logger.info("OpenClass Nexus AI - Starting Server")
     logger.info("=" * 60)
@@ -91,18 +65,46 @@ async def startup_event():
         logger.info("Server starting in demo mode")
     
     logger.info("=" * 60)
-    logger.info(f"Server running at: http://{config.HOST}:{config.PORT}")
+    logger.info(f"Server running at: http://{config.api_host}:{config.api_port}")
     logger.info("=" * 60)
-
-# ===========================
-# Shutdown Event
-# ===========================
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Cleanup on shutdown"""
+    
+    yield
+    
+    # Shutdown
     logger.info("Shutting down server...")
     app_state.shutdown()
     logger.info("Server shutdown complete")
+
+
+# ===========================
+# Initialize FastAPI App
+# ===========================
+app = FastAPI(
+    title="OpenClass Nexus AI API",
+    description="Local AI Tutor API untuk Kurikulum Nasional",
+    version="1.0.0",
+    debug=config.debug,
+    lifespan=lifespan
+)
+
+# ===========================
+# CORS Middleware
+# ===========================
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=config.cors_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ===========================
+# Mount Static Files
+# ===========================
+if config.frontend_dir.exists():
+    app.mount("/static", StaticFiles(directory=str(config.frontend_dir)), name="static")
+else:
+    logger.warning(f"Frontend directory not found: {config.frontend_dir}")
 
 # ===========================
 # Health Check Endpoint
@@ -213,13 +215,13 @@ if __name__ == "__main__":
     print("=" * 60)
     print("OpenClass Nexus AI - Local Server")
     print("=" * 60)
-    print(f"Server akan berjalan di: http://{config.HOST}:{config.PORT}")
+    print(f"Server akan berjalan di: http://{config.api_host}:{config.api_port}")
     print("Buka browser dan akses URL di atas")
     print("=" * 60)
     
     uvicorn.run(
         app,
-        host=config.HOST,
-        port=config.PORT,
-        log_level=config.LOG_LEVEL.lower()
+        host=config.api_host,
+        port=config.api_port,
+        log_level=config.log_level.lower()
     )

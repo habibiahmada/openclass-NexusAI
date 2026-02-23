@@ -15,7 +15,8 @@ embedding:
   bedrock:
     model_id: amazon.titan-embed-text-v1
     region: us-east-1
-    timeout: 30  # seconds
+    timeout: 60  # seconds (increased from 30 for better reliability)
+    max_workers: 3  # parallel workers for batch processing
   
   # Local configuration (MiniLM)
   local:

@@ -117,7 +117,7 @@ class AppState:
             
             logger.info("Initializing concurrency manager...")
             self.concurrency_manager = ConcurrencyManager(
-                max_concurrent=config.MAX_CONCURRENT_REQUESTS
+                max_concurrent=config.max_concurrent_requests
             )
             self.token_streamer = TokenStreamer()
             self.concurrency_manager.start_processing()
@@ -209,14 +209,13 @@ class AppState:
             
             # Create pipeline configuration
             pipeline_config = PipelineConfig(
-                model_cache_dir=config.MODEL_CACHE_DIR,
-                chroma_db_path=config.CHROMA_DB_PATH,
-                chroma_collection_name=config.CHROMA_COLLECTION_NAME,
+                model_cache_dir=config.model_cache_dir,
+                chroma_db_path=config.chroma_db_path,
+                chroma_collection_name=config.chroma_collection_name,
                 enable_performance_monitoring=True,
                 enable_batch_processing=False,
                 enable_graceful_degradation=True,
-                memory_limit_mb=config.MEMORY_LIMIT_MB,
-                log_level=config.LOG_LEVEL
+                log_level=config.log_level.upper()
             )
             
             # Initialize pipeline

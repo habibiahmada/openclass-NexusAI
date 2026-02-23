@@ -13,11 +13,18 @@ from .chat_history_repository import ChatHistoryRepository, ChatHistory
 from .subject_repository import SubjectRepository, Subject
 from .book_repository import BookRepository, Book
 from .cache_manager import CacheManager, CacheStats
-from .redis_cache import RedisCache
 from .lru_cache import LRUCache
 from .cache_utils import generate_cache_key, normalize_question
 from .cache_integration import CachedRAGPipeline, get_current_vkp_version
 from .cache_invalidation import CacheInvalidator, invalidate_cache_on_vkp_update
+
+# Conditional import for RedisCache (requires redis package)
+try:
+    from .redis_cache import RedisCache
+    _redis_available = True
+except ImportError:
+    RedisCache = None
+    _redis_available = False
 
 __all__ = [
     'DatabaseManager',
@@ -33,7 +40,6 @@ __all__ = [
     'Book',
     'CacheManager',
     'CacheStats',
-    'RedisCache',
     'LRUCache',
     'generate_cache_key',
     'normalize_question',
@@ -42,4 +48,8 @@ __all__ = [
     'CacheInvalidator',
     'invalidate_cache_on_vkp_update'
 ]
+
+# Add RedisCache to __all__ only if available
+if _redis_available:
+    __all__.append('RedisCache')
 

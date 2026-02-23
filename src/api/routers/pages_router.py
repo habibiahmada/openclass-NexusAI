@@ -18,21 +18,21 @@ def create_pages_router():
     @router.get("/")
     async def root():
         """Serve landing page"""
-        return FileResponse(config.FRONTEND_DIR / "index.html")
+        return FileResponse(config.frontend_dir / "index.html")
     
     @router.get("/siswa")
     async def siswa_page():
         """Serve student page"""
-        return FileResponse(config.FRONTEND_DIR / "pages" / "siswa.html")
+        return FileResponse(config.frontend_dir / "pages" / "siswa.html")
     
     @router.get("/guru")
     async def guru_page():
         """Serve teacher page"""
-        return FileResponse(config.FRONTEND_DIR / "pages" / "guru.html")
+        return FileResponse(config.frontend_dir / "pages" / "guru.html")
     
     @router.get("/admin")
     async def admin_page():
         """Serve admin page"""
-        return FileResponse(config.FRONTEND_DIR / "pages" / "admin.html")
+        return FileResponse(config.frontend_dir / "pages" / "admin.html")
     
     return router

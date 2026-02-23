@@ -12,8 +12,11 @@ class AWSConfig:
         self.access_key = os.getenv('AWS_ACCESS_KEY_ID')
         self.secret_key = os.getenv('AWS_SECRET_ACCESS_KEY')
         
-        # S3 Configuration
-        self.s3_bucket = os.getenv('S3_BUCKET_NAME')
+        # S3 Configuration - Multiple Buckets
+        self.s3_bucket = os.getenv('S3_BUCKET_NAME')  # Legacy/default bucket
+        self.curriculum_raw_bucket = os.getenv('S3_CURRICULUM_RAW_BUCKET', 'nexusai-curriculum-raw')
+        self.vkp_packages_bucket = os.getenv('S3_VKP_PACKAGES_BUCKET', 'nexusai-vkp-packages')
+        self.model_distribution_bucket = os.getenv('S3_MODEL_DISTRIBUTION_BUCKET', 'nexusai-model-distribution')
         
         # CloudFront Configuration
         self.cloudfront_distribution_id = os.getenv('CLOUDFRONT_DISTRIBUTION_ID')

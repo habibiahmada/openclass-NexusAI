@@ -28,24 +28,24 @@ def get_db_config():
     return {
         'host': os.getenv('DB_HOST', 'localhost'),
         'port': os.getenv('DB_PORT', '5432'),
-        'database': os.getenv('DB_NAME', 'nexusai'),
+        'database': os.getenv('DB_NAME', 'nexusai_db'),
         'user': os.getenv('DB_USER', 'root'),
         'password': os.getenv('DB_PASSWORD', 'root')
     }
 
 
-def create_database(db_name='nexusai'):
+def create_database(db_name='nexusai_db'):
     """Create the database if it doesn't exist."""
     config = get_db_config()
     
     try:
         # Connect to default postgres database
         conn = psycopg2.connect(
-            host=config['127.0.0.1'],
+            host=config['host'],
             port=config['port'],
             database='postgres',
-            user=config['root'],
-            password=config['root']
+            user=config['user'],
+            password=config['password']
         )
         conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cursor = conn.cursor()
@@ -234,7 +234,7 @@ def seed_data():
         for subject_id, topic, difficulty, question, answer in practice_questions:
             if subject_id:
                 cursor.execute("""
-                    INSERT INTO practice_questions (subject_id, topic, difficulty, question, answer)
+                    INSERT INTO practice_questions (subject_id, topic, difficulty, question_text, answer_hint)
                     VALUES (%s, %s, %s, %s, %s)
                 """, (subject_id, topic, difficulty, question, answer))
         

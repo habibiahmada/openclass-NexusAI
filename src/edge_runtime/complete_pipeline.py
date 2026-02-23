@@ -438,7 +438,8 @@ class CompletePipeline:
                 memory_usage = metrics.get('memory_usage_mb', 0)
                 health['checks']['memory_usage_mb'] = memory_usage
                 
-                if memory_usage > self.config.memory_limit_mb * 0.9:  # 90% of limit
+                # Check against memory monitor limit if available
+                if self.memory_monitor and memory_usage > self.memory_monitor.memory_limit_mb * 0.9:
                     issues.append(f"High memory usage: {memory_usage}MB")
             else:
                 issues.append("Inference engine not initialized")
@@ -518,13 +519,13 @@ class CompletePipeline:
                 persist_directory=self.config.chroma_db_path
             )
             
-            # Ensure collection exists
+            # Get or create collection
             try:
-                collection = self.vector_db.get_collection(self.config.chroma_collection_name)
+                collection = self.vector_db.create_collection(self.config.chroma_collection_name)
                 doc_count = self.vector_db.count_documents()
                 logger.info(f"Vector database initialized with {doc_count} documents")
-            except ValueError:
-                logger.warning("ChromaDB collection not found, will be created when needed")
+            except Exception as e:
+                logger.warning(f"ChromaDB collection issue: {e}, will be created when needed")
                 
         except Exception as e:
             logger.error(f"Failed to initialize vector database: {e}")
@@ -607,9 +608,12 @@ class CompletePipeline:
         
         logger.info("Initializing batch processing...")
         
+        # Use memory monitor's limit if available, otherwise use a default
+        memory_threshold = self.memory_monitor.memory_limit_mb * 0.9 if self.memory_monitor else 2764.8  # 90% of 3072MB
+        
         batch_config = BatchProcessingConfig(
             max_concurrent_queries=self.config.max_concurrent_queries,
-            memory_threshold_mb=self.config.memory_limit_mb * 0.9  # 90% of limit
+            memory_threshold_mb=memory_threshold
         )
         
         self.batch_processor = BatchProcessor(
@@ -721,7 +725,8 @@ class CompletePipeline:
         """Log comprehensive system status after initialization."""
         logger.info("=== Pipeline System Status ===")
         logger.info(f"Model: {self.model_config.model_id}")
-        logger.info(f"Memory limit: {self.config.memory_limit_mb}MB")
+        if self.memory_monitor:
+            logger.info(f"Memory limit: {self.memory_monitor.memory_limit_mb}MB")
         logger.info(f"Thread count: {self.inference_configs['default'].n_threads}")
         logger.info(f"Context window: {self.inference_configs['default'].n_ctx}")
         logger.info(f"Batch processing: {'enabled' if self.config.enable_batch_processing else 'disabled'}")

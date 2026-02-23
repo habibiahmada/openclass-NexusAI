@@ -17,7 +17,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # Add project root to path
-project_root = Path(__file__).parent.parent
+project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 # Load environment variables
@@ -241,37 +241,54 @@ def check_phase_6():
             print(f"✗ {file} not found")
             checks.append(False)
     
-    # Check integration with API server
-    api_server = project_root / 'api_server.py'
-    if api_server.exists():
-        with open(api_server, 'r', encoding='utf-8') as f:
+    # Check integration with state.py (modular architecture)
+    state_file = project_root / 'src' / 'api' / 'state.py'
+    if state_file.exists():
+        with open(state_file, 'r', encoding='utf-8') as f:
             content = f.read()
             
-            # Check if pedagogical integration is imported
-            if 'from src.pedagogy.integration import' in content:
-                print("✓ Pedagogical integration imported in api_server.py")
+            # Check if pedagogical integration is initialized
+            if 'from src.pedagogy.integration import' in content or 'pedagogical_integration' in content:
+                print("✓ Pedagogical integration initialized in state.py")
                 checks.append(True)
             else:
-                print("✗ Pedagogical integration not imported in api_server.py")
-                checks.append(False)
-            
-            # Check if pedagogical endpoints exist
-            if '/api/student/progress' in content:
-                print("✓ Pedagogical endpoints exist in api_server.py")
-                checks.append(True)
-            else:
-                print("✗ Pedagogical endpoints not found in api_server.py")
-                checks.append(False)
-            
-            # Check if process_student_question is called
-            if 'process_student_question' in content:
-                print("✓ process_student_question called in chat endpoint")
-                checks.append(True)
-            else:
-                print("✗ process_student_question not called in chat endpoint")
+                print("✗ Pedagogical integration not initialized in state.py")
                 checks.append(False)
     else:
-        print("✗ api_server.py not found")
+        print("✗ state.py not found")
+        checks.append(False)
+    
+    # Check if pedagogy router exists
+    pedagogy_router = project_root / 'src' / 'api' / 'routers' / 'pedagogy_router.py'
+    if pedagogy_router.exists():
+        with open(pedagogy_router, 'r', encoding='utf-8') as f:
+            content = f.read()
+            
+            # Check if pedagogical endpoints exist
+            if '/api/student/progress' in content or '/progress' in content:
+                print("✓ Pedagogical endpoints exist in pedagogy_router.py")
+                checks.append(True)
+            else:
+                print("✗ Pedagogical endpoints not found in pedagogy_router.py")
+                checks.append(False)
+    else:
+        print("✗ pedagogy_router.py not found")
+        checks.append(False)
+    
+    # Check if process_student_question is called in chat router
+    chat_router = project_root / 'src' / 'api' / 'routers' / 'chat_router.py'
+    if chat_router.exists():
+        with open(chat_router, 'r', encoding='utf-8') as f:
+            content = f.read()
+            
+            if 'process_student_question' in content:
+                print("✓ process_student_question called in chat_router.py")
+                checks.append(True)
+            else:
+                print("✗ process_student_question not called in chat_router.py")
+                checks.append(False)
+    else:
+        print("✗ chat_router.py not found")
         checks.append(False)
     
     return all(checks)

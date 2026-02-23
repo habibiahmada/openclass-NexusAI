@@ -75,7 +75,7 @@ class EmbeddingStrategyManager:
                     self.strategies['bedrock'] = BedrockEmbeddingStrategy(
                         model_id=bedrock_config.get('model_id', 'amazon.titan-embed-text-v1'),
                         region=bedrock_config.get('region', 'us-east-1'),
-                        timeout=bedrock_config.get('timeout', 30)
+                        timeout=bedrock_config.get('timeout', 60)
                     )
                 except Exception as e:
                     logger.warning(f"Failed to initialize Bedrock strategy: {e}")

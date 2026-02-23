@@ -18,6 +18,7 @@ from botocore.exceptions import ClientError, BotoCoreError
 from src.aws_control_plane.cloudfront_setup import CloudFrontManager
 from src.aws_control_plane.s3_event_trigger import S3EventTriggerManager
 from src.aws_control_plane.lambda_processor import LambdaProcessorPackager
+from config.aws_config import aws_config
 
 # Configure logging
 logging.basicConfig(
@@ -30,10 +31,10 @@ logger = logging.getLogger(__name__)
 @dataclass
 class InfrastructureConfig:
     """Configuration for AWS infrastructure setup"""
-    region: str = os.getenv("AWS_INFRASTRUCTURE_REGION", "ap-southeast-2")
-    curriculum_raw_bucket: str = os.getenv("AWS_CURRICULUM_RAW_BUCKET", "nexusai-curriculum-raw")
-    vkp_packages_bucket: str = os.getenv("AWS_VKP_PACKAGES_BUCKET", "nexusai-vkp-packages")
-    model_distribution_bucket: str = os.getenv("AWS_MODEL_DISTRIBUTION_BUCKET", "nexusai-model-distribution")
+    region: str = aws_config.region
+    curriculum_raw_bucket: str = aws_config.curriculum_raw_bucket
+    vkp_packages_bucket: str = aws_config.vkp_packages_bucket
+    model_distribution_bucket: str = aws_config.model_distribution_bucket
     schools_table: str = os.getenv("AWS_SCHOOLS_TABLE", "nexusai-schools")
     metrics_table: str = os.getenv("AWS_METRICS_TABLE", "nexusai-metrics")
     lambda_function_name: str = os.getenv("AWS_LAMBDA_FUNCTION_NAME", "nexusai-curriculum-processor")

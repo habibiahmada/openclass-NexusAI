@@ -21,12 +21,6 @@ def create_auth_router(auth_service: AuthService, verify_token_dependency):
     @router.post("/login", response_model=LoginResponse)
     async def login(request: LoginRequest):
         """Login endpoint - offline-first authentication with database persistence"""
-        if not auth_service.session_repo or not auth_service.user_repo:
-            raise HTTPException(
-                status_code=503,
-                detail="Database temporarily unavailable. Authentication is disabled."
-            )
-        
         try:
             # Verify credentials
             result = auth_service.verify_credentials(
@@ -43,7 +37,7 @@ def create_auth_router(auth_service: AuthService, verify_token_dependency):
                     role=""
                 )
             
-            # Create session
+            # Create session (will use in-memory if database not available)
             session_data = auth_service.create_session(
                 result['username'],
                 request.role.lower()
@@ -61,8 +55,8 @@ def create_auth_router(auth_service: AuthService, verify_token_dependency):
         except Exception as e:
             logger.error(f"Login failed: {e}", exc_info=True)
             raise HTTPException(
-                status_code=503,
-                detail="Database temporarily unavailable"
+                status_code=500,
+                detail="Login failed. Please try again."
             )
     
     @router.post("/verify", response_model=TokenVerifyResponse)
@@ -76,13 +70,7 @@ def create_auth_router(auth_service: AuthService, verify_token_dependency):
     
     @router.post("/logout")
     async def logout(token_data: Dict = Depends(verify_token_dependency)):
-        """Logout endpoint - invalidate token in database"""
-        if not auth_service.session_repo:
-            raise HTTPException(
-                status_code=503,
-                detail="Database temporarily unavailable"
-            )
-        
+        """Logout endpoint - invalidate token"""
         try:
             deleted_count = auth_service.logout(token_data['user_id'])
             return {
@@ -93,8 +81,8 @@ def create_auth_router(auth_service: AuthService, verify_token_dependency):
         except Exception as e:
             logger.error(f"Logout failed: {e}", exc_info=True)
             raise HTTPException(
-                status_code=503,
-                detail="Database temporarily unavailable"
+                status_code=500,
+                detail="Logout failed. Please try again."
             )
     
     return router

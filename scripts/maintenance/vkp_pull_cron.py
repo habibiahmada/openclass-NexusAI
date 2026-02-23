@@ -1,25 +1,3 @@
-#!/usr/bin/env python3
-"""
-VKP Pull Cron Job
-
-This script runs periodically (hourly) to check for VKP updates from AWS S3,
-download new versions, verify integrity, and extract to ChromaDB.
-
-Requirements: 7.1, 7.7
-
-Usage:
-    python scripts/vkp_pull_cron.py
-
-Cron Configuration (Linux):
-    # Run every hour
-    0 * * * * /usr/bin/python3 /path/to/scripts/vkp_pull_cron.py >> /var/log/nexusai/vkp_pull.log 2>&1
-
-Windows Task Scheduler:
-    Task: VKP Update Check
-    Trigger: Daily, repeat every 1 hour
-    Action: python.exe C:\NexusAI\scripts\vkp_pull_cron.py
-"""
-
 import sys
 import os
 import logging
@@ -90,7 +68,8 @@ def main():
         logger.info("Internet connection available")
         
         # Load configuration
-        bucket_name = os.getenv('VKP_BUCKET_NAME', 'nexusai-vkp-packages')
+        from config.aws_config import aws_config
+        bucket_name = os.getenv('VKP_BUCKET_NAME', aws_config.vkp_packages_bucket)
         db_connection_string = os.getenv(
             'DATABASE_URL',
             'postgresql://nexusai:nexusai@localhost:5432/nexusai'

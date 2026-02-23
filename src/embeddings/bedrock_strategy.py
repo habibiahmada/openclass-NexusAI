@@ -6,6 +6,7 @@ import json
 import time
 from typing import List
 import logging
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import boto3
 from botocore.exceptions import ClientError
@@ -134,11 +135,12 @@ class BedrockEmbeddingStrategy(EmbeddingStrategy):
             
             raise Exception("Unexpected error: max retries reached without success")
     
-    def batch_generate(self, texts: List[str]) -> List[List[float]]:
-        """Generate embeddings for multiple texts with batching.
+    def batch_generate(self, texts: List[str], max_workers: int = 10) -> List[List[float]]:
+        """Generate embeddings for multiple texts with parallel processing.
         
         Args:
             texts: List of input texts to embed
+            max_workers: Maximum number of parallel workers (default: 10)
             
         Returns:
             List of 1536-dimensional embedding vectors
@@ -150,21 +152,40 @@ class BedrockEmbeddingStrategy(EmbeddingStrategy):
         if not texts:
             raise ValueError("Texts list cannot be empty")
         
-        embeddings = []
-        logger.info(f"Processing {len(texts)} texts with Bedrock Titan")
+        logger.info(f"Processing {len(texts)} texts with Bedrock Titan using {max_workers} parallel workers")
         
-        for i, text in enumerate(texts):
+        embeddings = [None] * len(texts)
+        
+        def process_text(index: int, text: str):
+            """Process a single text and return its index and embedding"""
             try:
                 embedding = self.generate_embedding(text)
-                embeddings.append(embedding)
-                
-                # Add delay between requests to avoid rate limiting
-                if i < len(texts) - 1:
-                    time.sleep(0.5)
-                    
+                return index, embedding, None
             except Exception as e:
-                logger.error(f"Failed to generate embedding for text {i}: {e}")
-                raise
+                return index, None, e
+        
+        # Use ThreadPoolExecutor for parallel processing
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            # Submit all tasks
+            futures = {
+                executor.submit(process_text, i, text): i 
+                for i, text in enumerate(texts)
+            }
+            
+            # Collect results as they complete
+            completed = 0
+            for future in as_completed(futures):
+                index, embedding, error = future.result()
+                
+                if error:
+                    logger.error(f"Failed to generate embedding for text {index}: {error}")
+                    raise error
+                
+                embeddings[index] = embedding
+                completed += 1
+                
+                if completed % 10 == 0:
+                    logger.info(f"Progress: {completed}/{len(texts)} embeddings generated")
         
         logger.info(f"Successfully generated {len(embeddings)} embeddings")
         return embeddings

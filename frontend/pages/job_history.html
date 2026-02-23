@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job History - OpenClass Nexus AI</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/job_history.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="page-header">
+            <h1>📊 ETL Pipeline Job History</h1>
+            <div class="header-actions">
+                <a href="admin_dashboard.html" class="btn btn-secondary">← Back to Dashboard</a>
+            </div>
+        </header>
+
+        <!-- Cost Analytics -->
+        <section class="cost-section">
+            <h2>💰 Cost Analytics (Last 7 Days)</h2>
+            <div class="cost-cards">
+                <div class="cost-card">
+                    <div class="cost-label">Total Jobs</div>
+                    <div class="cost-value" id="total-jobs">--</div>
+                </div>
+                <div class="cost-card">
+                    <div class="cost-label">Total Cost</div>
+                    <div class="cost-value" id="total-cost">$--</div>
+                </div>
+                <div class="cost-card">
+                    <div class="cost-label">Avg Cost/Job</div>
+                    <div class="cost-value" id="avg-cost-job">$--</div>
+                </div>
+                <div class="cost-card">
+                    <div class="cost-label">Cost/File</div>
+                    <div class="cost-value" id="cost-per-file">$--</div>
+                </div>
+                <div class="cost-card">
+                    <div class="cost-label">Cost/Embedding</div>
+                    <div class="cost-value" id="cost-per-embedding">$--</div>
+                </div>
+            </div>
+            
+            <!-- Cost Chart -->
+            <div class="chart-container">
+                <canvas id="cost-chart"></canvas>
+            </div>
+        </section>
+
+        <!-- Filters -->
+        <section class="filters-section">
+            <h2>🔍 Filters</h2>
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="status-filter">Status:</label>
+                    <select id="status-filter" onchange="applyFilters()">
+                        <option value="">All</option>
+                        <option value="completed">Completed</option>
+                        <option value="failed">Failed</option>
+                        <option value="running">Running</option>
+                        <option value="partial">Partial</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="date-from">From:</label>
+                    <input type="date" id="date-from" onchange="applyFilters()">
+                </div>
+                
+                <div class="filter-group">
+                    <label for="date-to">To:</label>
+                    <input type="date" id="date-to" onchange="applyFilters()">
+                </div>
+                
+                <button onclick="clearFilters()" class="btn btn-secondary">Clear Filters</button>
+            </div>
+        </section>
+
+        <!-- Job List -->
+        <section class="jobs-section">
+            <h2>📋 Job List</h2>
+            <div class="table-container">
+                <table class="jobs-table">
+                    <thead>
+                        <tr>
+                            <th>Job ID</th>
+                            <th>Status</th>
+                            <th>Start Time</th>
+                            <th>Duration</th>
+                            <th>Files</th>
+                            <th>Chunks</th>
+                            <th>Embeddings</th>
+                            <th>Cost</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="jobs-table-body">
+                        <tr>
+                            <td colspan="9" class="loading">Loading jobs...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            <div class="pagination" id="pagination">
+                <!-- Pagination buttons will be inserted here -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Job Details Modal -->
+    <div id="job-details-modal" class="modal" style="display: none;">
+        <div class="modal-overlay" onclick="closeJobDetails()"></div>
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h2>Job Details</h2>
+                <button class="modal-close" onclick="closeJobDetails()">×</button>
+            </div>
+            <div class="modal-body" id="job-details-body">
+                <!-- Job details will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <script src="../js/job_history.js"></script>
+    <script src="../js/notifications.js"></script>
+    <script src="../js/websocket.js"></script>
+</body>
+</html>

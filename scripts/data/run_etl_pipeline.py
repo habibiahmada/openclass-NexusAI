@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import Optional
 
 # Add project root to path
-project_root = Path(__file__).parent.parent
+project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 from dotenv import load_dotenv
@@ -31,6 +31,7 @@ from src.data_processing.validator import Validator
 from src.data_processing.cost_tracker import CostTracker
 from src.aws_control_plane.s3_storage_manager import S3StorageManager
 from src.aws_control_plane.cloudfront_manager import CloudFrontManager
+from src.aws_control_plane.job_tracker import JobTracker
 from config.app_config import app_config
 
 
@@ -141,9 +142,16 @@ Examples:
     
     # S3 upload options
     parser.add_argument(
+        '--upload-to-s3',
+        action='store_true',
+        default=True,
+        help='Upload processed files to S3 (enabled by default, use --no-upload to skip)'
+    )
+    
+    parser.add_argument(
         '--no-upload',
         action='store_true',
-        help='Skip S3 upload phase'
+        help='Skip S3 upload phase (overrides --upload-to-s3)'
     )
     
     parser.add_argument(
@@ -445,6 +453,16 @@ def main():
     # Load environment variables
     load_dotenv()
     
+    # Initialize job tracker
+    job_tracker = None
+    job_id = None
+    try:
+        job_tracker = JobTracker()
+        logger.info("✓ DynamoDB job tracker initialized")
+    except Exception as e:
+        logger.warning(f"Could not initialize job tracker: {e}")
+        logger.warning("Continuing without job tracking...")
+    
     logger.info("=" * 60)
     logger.info("OpenClass Nexus AI - ETL Pipeline")
     logger.info("=" * 60)
@@ -466,6 +484,23 @@ def main():
         batch_size=args.batch_size,
         budget_limit=args.budget
     )
+    
+    # Start job tracking
+    if job_tracker:
+        try:
+            job_id = job_tracker.start_job(
+                job_type="etl_pipeline",
+                input_dir=args.input_dir,
+                config={
+                    'chunk_size': args.chunk_size,
+                    'chunk_overlap': args.chunk_overlap,
+                    'batch_size': args.batch_size,
+                    'budget_limit': args.budget
+                }
+            )
+            logger.info(f"✓ Job tracking started: {job_id}")
+        except Exception as e:
+            logger.warning(f"Could not start job tracking: {e}")
     
     # Initialize pipeline
     pipeline = ETLPipeline(config)
@@ -489,10 +524,11 @@ def main():
         except Exception as e:
             logger.error(f"Validation failed: {e}", exc_info=True)
     
-    # Upload to S3 (unless skipped)
+    # Upload to S3 (enabled by default, unless --no-upload specified)
     s3_uploaded = False
     if not args.no_upload:
         try:
+            logger.info("\n📤 Uploading to S3 (use --no-upload to skip)...")
             s3_uploaded = run_s3_upload(
                 config=config,
                 subject=args.subject,
@@ -501,6 +537,8 @@ def main():
             )
         except Exception as e:
             logger.error(f"S3 upload failed: {e}", exc_info=True)
+    else:
+        logger.info("\n⏭️  S3 upload skipped (--no-upload flag)")
     
     # Invalidate CloudFront cache (if requested and upload succeeded)
     cache_invalidated = False
@@ -509,6 +547,41 @@ def main():
             cache_invalidated = run_cloudfront_invalidation()
         except Exception as e:
             logger.error(f"Cache invalidation failed: {e}", exc_info=True)
+    
+    # Complete job tracking
+    if job_tracker and job_id:
+        try:
+            status = "completed" if pipeline_result.failed_files == 0 else "partial"
+            if pipeline_result.successful_files == 0:
+                status = "failed"
+            
+            job_tracker.complete_job(
+                job_id=job_id,
+                status=status,
+                total_files=pipeline_result.total_files,
+                successful_files=pipeline_result.successful_files,
+                failed_files=pipeline_result.failed_files,
+                total_chunks=pipeline_result.total_chunks,
+                total_embeddings=pipeline_result.total_embeddings,
+                processing_time=pipeline_result.processing_time,
+                estimated_cost=pipeline_result.estimated_cost,
+                errors=pipeline_result.errors
+            )
+            logger.info(f"✓ Job tracking completed: {job_id}")
+            
+            # Print cost summary
+            cost_summary = job_tracker.get_cost_summary(days=7)
+            logger.info("\n" + "=" * 60)
+            logger.info("Cost Summary (Last 7 Days)")
+            logger.info("=" * 60)
+            logger.info(f"Total jobs: {cost_summary['total_jobs']}")
+            logger.info(f"Total cost: ${cost_summary['total_cost']:.4f}")
+            logger.info(f"Average cost per job: ${cost_summary['average_cost_per_job']:.4f}")
+            logger.info(f"Cost per file: ${cost_summary['cost_per_file']:.6f}")
+            logger.info(f"Cost per embedding: ${cost_summary['cost_per_embedding']:.8f}")
+            logger.info("=" * 60)
+        except Exception as e:
+            logger.warning(f"Could not complete job tracking: {e}")
     
     # Print final summary
     exit_code = print_final_summary(

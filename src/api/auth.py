@@ -58,6 +58,9 @@ class AuthService:
     def __init__(self, session_repo=None, user_repo=None):
         self.session_repo = session_repo
         self.user_repo = user_repo
+        # In-memory sessions for demo mode (when database is not available)
+        self._memory_sessions = {}
+        self._memory_users = {}
     
     def verify_credentials(self, username: str, password: str, role: str) -> Dict:
         """Verify user credentials"""
@@ -94,86 +97,137 @@ class AuthService:
     
     def create_session(self, username: str, role: str) -> Dict:
         """Create new session with token"""
-        if not self.session_repo or not self.user_repo:
-            raise HTTPException(
-                status_code=503,
-                detail="Database temporarily unavailable"
-            )
-        
         # Generate token
         token = generate_token()
         
-        # Get or create user in database
-        db_user = self.user_repo.get_user_by_username(username)
-        if not db_user:
-            plain_password = DEMO_PLAIN_PASSWORDS.get(username, "default123")
-            db_user = self.user_repo.create_user(
-                username=username,
-                password=plain_password,
-                role=role,
-                full_name=DEMO_USERS[username]['name']
-            )
+        # If database is available, use it
+        if self.session_repo and self.user_repo:
+            try:
+                # Get or create user in database
+                db_user = self.user_repo.get_user_by_username(username)
+                if not db_user:
+                    plain_password = DEMO_PLAIN_PASSWORDS.get(username, "default123")
+                    db_user = self.user_repo.create_user(
+                        username=username,
+                        password=plain_password,
+                        role=role,
+                        full_name=DEMO_USERS[username]['name']
+                    )
+                
+                # Create session in database
+                session = self.session_repo.create_session(
+                    user_id=db_user.id,
+                    token=token,
+                    expires_hours=24
+                )
+                
+                logger.info(f"User logged in (database): {username} ({role})")
+                
+                return {
+                    'token': token,
+                    'user_id': db_user.id,
+                    'session': session
+                }
+            except Exception as e:
+                logger.warning(f"Database session creation failed, using in-memory: {e}")
         
-        # Create session in database
-        session = self.session_repo.create_session(
-            user_id=db_user.id,
-            token=token,
-            expires_hours=24
-        )
+        # Fallback to in-memory sessions (demo mode)
+        # Use small positive integer for in-memory user IDs (compatible with PostgreSQL)
+        user_id = abs(hash(username)) % 1000000  # Keep it under 1 million
         
-        logger.info(f"User logged in: {username} ({role})")
+        # Store user in memory
+        self._memory_users[user_id] = {
+            'id': user_id,
+            'username': username,
+            'role': role,
+            'full_name': DEMO_USERS[username]['name']
+        }
+        
+        # Store session in memory
+        self._memory_sessions[token] = {
+            'user_id': user_id,
+            'username': username,
+            'role': role,
+            'created_at': datetime.now(),
+            'expires_at': datetime.now()
+        }
+        
+        logger.info(f"User logged in (in-memory): {username} ({role})")
         
         return {
             'token': token,
-            'user_id': db_user.id,
-            'session': session
+            'user_id': user_id,
+            'session': self._memory_sessions[token]
         }
     
     def verify_token(self, token: str) -> Dict:
         """Verify token and return user info"""
-        if not self.session_repo or not self.user_repo:
-            raise HTTPException(
-                status_code=503,
-                detail="Database temporarily unavailable"
-            )
+        # Try database first
+        if self.session_repo and self.user_repo:
+            try:
+                # Get session from database
+                session = self.session_repo.get_session_by_token(token)
+                
+                if session:
+                    # Get user info
+                    user = self.user_repo.get_user_by_id(session.user_id)
+                    
+                    if user:
+                        return {
+                            'username': user.username,
+                            'role': user.role,
+                            'name': user.full_name,
+                            'user_id': user.id,
+                            'created': session.created_at,
+                            'expires': session.expires_at
+                        }
+            except Exception as e:
+                logger.warning(f"Database token verification failed, trying in-memory: {e}")
         
-        # Get session from database
-        session = self.session_repo.get_session_by_token(token)
+        # Fallback to in-memory sessions
+        if token in self._memory_sessions:
+            session = self._memory_sessions[token]
+            user = self._memory_users.get(session['user_id'])
+            
+            if user:
+                return {
+                    'username': user['username'],
+                    'role': user['role'],
+                    'name': user['full_name'],
+                    'user_id': user['id'],
+                    'created': session['created_at'],
+                    'expires': session['expires_at']
+                }
         
-        if not session:
-            raise HTTPException(
-                status_code=401,
-                detail="Invalid or expired token"
-            )
-        
-        # Get user info
-        user = self.user_repo.get_user_by_id(session.user_id)
-        
-        if not user:
-            raise HTTPException(
-                status_code=401,
-                detail="User not found"
-            )
-        
-        return {
-            'username': user.username,
-            'role': user.role,
-            'name': user.full_name,
-            'user_id': user.id,
-            'created': session.created_at,
-            'expires': session.expires_at
-        }
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or expired token"
+        )
     
     def logout(self, user_id: int) -> int:
         """Logout user and delete sessions"""
-        if not self.session_repo:
-            raise HTTPException(
-                status_code=503,
-                detail="Database temporarily unavailable"
-            )
+        deleted_count = 0
         
-        deleted_count = self.session_repo.delete_user_sessions(user_id)
-        logger.info(f"User logged out: user_id={user_id} ({deleted_count} sessions deleted)")
+        # Try database first
+        if self.session_repo:
+            try:
+                deleted_count = self.session_repo.delete_user_sessions(user_id)
+                logger.info(f"User logged out (database): user_id={user_id} ({deleted_count} sessions deleted)")
+                return deleted_count
+            except Exception as e:
+                logger.warning(f"Database logout failed, trying in-memory: {e}")
+        
+        # Fallback to in-memory sessions
+        tokens_to_delete = [
+            token for token, session in self._memory_sessions.items()
+            if session['user_id'] == user_id
+        ]
+        
+        for token in tokens_to_delete:
+            del self._memory_sessions[token]
+            deleted_count += 1
+        
+        logger.info(f"User logged out (in-memory): user_id={user_id} ({deleted_count} sessions deleted)")
         
         return deleted_count
 
