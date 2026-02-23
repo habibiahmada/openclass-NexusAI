@@ -44,6 +44,7 @@ bsdiff4>=1.2.0
 pytest>=7.4.0
 pytest-asyncio>=0.21.0
 hypothesis>=6.92.0
+locust>=2.20.0  # Load testing
 
 # Development
 black>=23.9.0

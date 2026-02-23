@@ -854,7 +854,7 @@ Python 3.9+ (as specified in the design document)
     - **Property 34: Offline Operation Completeness**
     - **Validates: Requirements 17.1, 17.2, 17.3, 17.5**
 
-  - [ ] 13.9 Implement load testing suite
+  - [x] 13.9 Implement load testing suite
     - Create load test with Locust or similar tool
     - Test with 100 concurrent users
     - Test with 300 concurrent users
@@ -862,7 +862,7 @@ Python 3.9+ (as specified in the design document)
     - Measure error rate
     - _Requirements: 18.1-18.6_
 
-  - [ ] 13.10 Write property test for response latency
+  - [x] 13.10 Write property test for response latency
     - **Property 13: Response Latency Target**
     - **Validates: Requirements 5.5**
 

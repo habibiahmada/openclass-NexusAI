@@ -84,48 +84,81 @@ class ConcurrencyManager:
         
         This method should be run as a background task. It will continuously
         pull requests from the queue and process them with semaphore limiting.
+        
+        The key insight: We acquire the semaphore BEFORE dequeuing the next request.
+        This ensures we only pull requests when we have capacity to process them,
+        preventing queue buildup and excessive latency.
         """
         logger.info("Starting queue processing")
         
         while True:
             try:
-                # Get next request from queue
+                # CRITICAL: Acquire semaphore BEFORE getting request from queue
+                # This ensures we only dequeue when we have processing capacity
+                await self.semaphore.acquire()
+                
+                # Now get the next request - we know we have capacity
                 request = await self.queue.get()
                 
-                # Process with semaphore limiting
-                asyncio.create_task(self._process_request(request))
+                # Process in background task
+                # The semaphore is already acquired, so _process_request won't block
+                asyncio.create_task(self._process_with_acquired_semaphore(request))
+                
+                # Mark queue task as done
+                self.queue.task_done()
                 
             except Exception as e:
                 logger.error(f"Error in queue processing: {e}", exc_info=True)
+                # Release semaphore if we acquired it but failed
+                try:
+                    self.semaphore.release()
+                except:
+                    pass
                 await asyncio.sleep(1)  # Brief pause before retrying
     
-    async def _process_request(self, request: InferenceRequest) -> None:
+    async def _process_with_acquired_semaphore(self, request: InferenceRequest) -> None:
         """
-        Process a single inference request with semaphore limiting.
+        Process a request with an already-acquired semaphore.
+        
+        This wrapper ensures the semaphore is released after processing.
         
         Args:
             request: The inference request to process
         """
-        # Acquire semaphore (blocks if 5 threads active)
-        async with self.semaphore:
-            # Mark as active
-            self.active_requests[request.queue_id] = request
-            logger.info(f"Processing request {request.queue_id} (active: {len(self.active_requests)})")
+        try:
+            await self._process_request(request)
+        finally:
+            # Always release the semaphore
+            self.semaphore.release()
+    
+    async def _process_request(self, request: InferenceRequest) -> None:
+        """
+        Process a single inference request.
+        
+        Note: When called from process_queue(), the semaphore is already acquired.
+        When called directly (e.g., in tests), it will acquire the semaphore.
+        
+        Args:
+            request: The inference request to process
+        """
+        # Mark as active
+        self.active_requests[request.queue_id] = request
+        logger.info(f"Processing request {request.queue_id} (active: {len(self.active_requests)})")
+        
+        try:
+            # Placeholder for actual inference processing
+            # This will be integrated with the RAG pipeline in task 7.5
+            await asyncio.sleep(0.1)  # Simulate processing
             
-            try:
-                # Placeholder for actual inference processing
-                # This will be integrated with the RAG pipeline in task 7.5
-                await asyncio.sleep(0.1)  # Simulate processing
-                
-            except Exception as e:
-                logger.error(f"Error processing request {request.queue_id}: {e}", exc_info=True)
-                
-            finally:
-                # Release and cleanup
-                if request.queue_id in self.active_requests:
-                    del self.active_requests[request.queue_id]
-                self.completed_requests[request.queue_id] = datetime.now()
-                logger.info(f"Completed request {request.queue_id}")
+        except Exception as e:
+            logger.error(f"Error processing request {request.queue_id}: {e}", exc_info=True)
+            
+        finally:
+            # Release and cleanup
+            if request.queue_id in self.active_requests:
+                del self.active_requests[request.queue_id]
+            self.completed_requests[request.queue_id] = datetime.now()
+            logger.info(f"Completed request {request.queue_id}")
     
     def get_queue_position(self, queue_id: str) -> int:
         """
